@@ -1,0 +1,35 @@
+{
+  "name": "bubble_webapp_sample_vortex",
+  "description": "",
+  "main": "index.html",
+  "authors": [
+    "www.thebubbleworks.com"
+  ],
+  "license": "MIT",
+  "moduleType": [],
+  "homepage": "www.thebubbleworks.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "retro-joystick": "^0.0.5-dev.6",
+    "paper-button": "PolymerElements/paper-button#^1.0.3",
+    "paper-card": "PolymerElements/paper-card#^1.0.3",
+    "paper-dialog": "PolymerElements/paper-dialog#^1.0.1",
+    "paper-input": "PolymerElements/paper-input#^1.0.18",
+    "paper-progress": "PolymerElements/paper-progress#^1.0.2",
+    "paper-slider": "PolymerElements/paper-slider#^1.0.4",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.11",
+    "polymer": "Polymer/polymer#^1.1.2",
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.0.11",
+    "jquery": "^2.1.4"
+  },
+  "resolutions": {
+    "polymer": "^1.1.2",
+    "webcomponentsjs": "^0.7.20"
+  }
+}
