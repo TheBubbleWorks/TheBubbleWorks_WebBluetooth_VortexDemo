@@ -17,7 +17,7 @@ var driveService;
 var writeCharacteristic;
 var readCharacteristic;
 
-var USE_WEB_BLUETOOTH = false;
+var USE_WEB_BLUETOOTH = true;
 if (navigator.bluetooth == undefined) {
     alert("no bluetooth");
     USE_WEB_BLUETOOTH = false;
@@ -34,6 +34,8 @@ function resetVariables() {
     driveService = null;
     writeCharacteristic = null;
     readCharacteristic = null;
+    progress.hidden = true;
+
 }
 
 function handleError(error) {
@@ -89,7 +91,7 @@ function bleSetup() {
 else
     {
         console.log('Connecting...');
-        //progress.hidden = false;
+        progress.hidden = false;
         if (readCharacteristic == null) {
             navigator.bluetooth.requestDevice({
                     filters: [{
@@ -127,7 +129,7 @@ else
                 connected = true;
             console.log('> Found read characteristic');
             readCharacteristic = characteristic;
-            //progress.hidden = true;
+            progress.hidden = true;
             // Listen to device notifications
             return readCharacteristic.startNotifications().then(() => {
                     readCharacteristic.addEventListener('characteristicvaluechanged', event => {
@@ -146,7 +148,7 @@ else
             catch(handleError);
         } else {
 
-            //progress.hidden = true;
+            progress.hidden = true;
         }
     }
 })
