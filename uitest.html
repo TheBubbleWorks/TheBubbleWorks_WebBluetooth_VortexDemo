@@ -49,8 +49,7 @@
 
 
     <!-- Polymer Platinum  -->
-    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-device.html">
-    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-characteristic.html">
+    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-elements.html">
 
     <style>
 
@@ -113,6 +112,7 @@
         <paper-icon-button icon="menu"></paper-icon-button>
         <div flex><paper-toggle-button class="blue" id="connectToggle">Connect</paper-toggle-button></div>
         <div flex>Vortex</div>
+        <paper-button id="send-reset-button" raised>Send Reset</paper-button>
 
         <!--
         <paper-icon-button icon="search"></paper-icon-button>
@@ -135,6 +135,7 @@
 
 
     <iron-pages selected="0">
+
             <div id="retrostick" class="retrostick">
                 <div class="retrostick-base">
                     <div class="retrostick-base-joint"></div>
@@ -148,8 +149,12 @@
     </iron-pages>
 
 
-    <platinum-bluetooth-device services-filter='["heart_rate"]'>
-        <platinum-bluetooth-characteristic service='heart_rate' characteristic='heart_rate_control_point'>
+    <platinum-bluetooth-device services-filter='["0000dfb0-0000-1000-8000-00805f9b34fb"]'>
+        <!--<platinum-bluetooth-characteristic service='heart_rate' characteristic='heart_rate_control_point'>
+        </platinum-bluetooth-characteristic>-->
+        <platinum-bluetooth-characteristic service='0000dfb0-0000-1000-8000-00805f9b34fb'
+                                           characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'
+                                           on-value-changed='parseHeartRate'>
         </platinum-bluetooth-characteristic>
     </platinum-bluetooth-device>
 
@@ -188,19 +193,52 @@
         });
     </script>
 
-    <script>
-        var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
-        var batteryLevel = document.querySelector('platinum-bluetooth-characteristic');
-        var button = document.getElementById("connectToggle");
 
-        button.addEventListener('click', function() {
-               bluetoothDevice.request().then(function() {
-                   return batteryLevel.read().then(function(value) {
-                       var data = new DataView(value);
-                           console.log('Battery Level is ' + data.getUint8(0) + '%');
-                         });
-                   }).catch(function(error) { });
+
+
+
+    <script>
+        'use strict';
+        var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
+        var writeCharacteristic = document.querySelector('platinum-bluetooth-characteristic');
+
+
+        var connectButton = document.getElementById("connectToggle");
+        var resetButton = document.getElementById("send-reset-button");
+
+        function parseHeartRate(event) {
+            let value = event.target.value;
+            console.log("Got Heart rate: " + value);
+        }
+
+
+        connectButton.addEventListener('click', function() {
+            console.log("Connecting");
+
+            bluetoothDevice.request().then(function() {
+                    console.log("Connected");
+               });
              });
+
+
+
+        resetButton.addEventListener('click', function() {
+            bluetoothDevice.request().then(function(device) {
+                        // Writing 1 is the signal to reset energy expended.
+                        var resetCommand = new Uint8Array([0x60]);
+                        return writeCharacteristic.write(resetCommand).then(function() {
+                            console.log(device.name + ' has been reset');
+                        })
+                    })
+                    .catch(onError);
+        });
+
+        function onError(error) {
+            //template.text = 'Argh! ' + error;
+            //progressBar.indeterminate = false;
+            console.log("ERROR: " + error);
+        }
+
     </script>
 </body>
 </html>
