@@ -1,0 +1,213 @@
+
+<!doctype html>
+<html>
+<head>
+    <title>Bluetooth Vortex</title>
+    <meta name="description" content="Control a Vortex robot with a Web Bluetooth app.">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+
+    <!-- Polyfill Web Components support for older browsers -->
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <!--<script src="bower_components/webcomponentsjs/webcomponents.js"></script>-->
+
+
+    <!-- I think we may only need this if your going to define your own components -->
+    <link rel="import" href="bower_components/polymer/polymer.html">
+
+
+    <!-- Polymer Core/'Iron' components -->
+
+    <link rel="import" href="bower_components/iron-icon/iron-icon.html">
+    <link rel="import" href="bower_components/iron-icons/iron-icons.html">
+    <link rel="import" href="bower_components/iron-pages/iron-pages.html">
+
+
+    <!-- Polymer Material Design components -->
+
+    <link rel="import" href="bower_components/paper-card/paper-card.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-container.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-error.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-char-counter.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
+    <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+    <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+
+    <link rel="import" href="bower_components/paper-tabs/paper-tab.html">
+    <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+    <link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
+
+    <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+
+
+    <!-- Polymer Platinum  -->
+    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-device.html">
+    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-characteristic.html">
+
+    <style>
+
+        body {
+            font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+            margin: 0;
+            padding: 24px;
+            color: #333;
+        }
+
+        paper-tabs, core-toolbar {
+            background-color: #00bcd4;
+            color: #fff;
+            box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        core-toolbar paper-tabs {
+            box-shadow: none;
+        }
+
+        paper-tabs[noink][nobar] paper-tab.core-selected {
+            color: #ffff8d;
+        }
+
+        paper-tabs.transparent-teal {
+            background-color: transparent;
+            color: #00bcd4;
+            box-shadow: none;
+        }
+
+        paper-tabs.transparent-teal::shadow #selectionBar {
+            background-color: #00bcd4;
+        }
+
+        paper-tabs.transparent-teal paper-tab::shadow #ink {
+            color: #00bcd4;
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+    </style>
+
+
+
+
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/retro-joystick/scripts/retro-joystick.js"></script>
+
+    <link rel="stylesheet" href="bower_components/retro-joystick/styles/retro-joystick.css">
+
+</head>
+<body unresolved>
+
+
+    <paper-toolbar class="medium-tall">
+
+        <paper-icon-button icon="menu"></paper-icon-button>
+        <div flex><paper-toggle-button class="blue" id="connectToggle">Connect</paper-toggle-button></div>
+        <div flex>Vortex</div>
+
+        <!--
+        <paper-icon-button icon="search"></paper-icon-button>
+        <paper-icon-button icon="more-vert"></paper-icon-button>
+        -->
+
+        <div class="bottom fit" horizontal layout>
+
+            <paper-tabs selected="0" flex style="max-width: 600px;">
+
+                <paper-tab>Moving</paper-tab>
+                <paper-tab>Emotions</paper-tab>
+                <paper-tab>Colours</paper-tab>
+
+            </paper-tabs>
+
+        </div>
+
+    </paper-toolbar>
+
+
+    <iron-pages selected="0">
+            <div id="retrostick" class="retrostick">
+                <div class="retrostick-base">
+                    <div class="retrostick-base-joint"></div>
+
+                    <div class="retrostick-stick-wrap">
+                        <div class="retrostick-stick"></div>
+                    </div>
+                    <div class="retrostick-ball"></div>
+                </div>
+        </div>
+    </iron-pages>
+
+
+    <platinum-bluetooth-device services-filter='["heart_rate"]'>
+        <platinum-bluetooth-characteristic service='heart_rate' characteristic='heart_rate_control_point'>
+        </platinum-bluetooth-characteristic>
+    </platinum-bluetooth-device>
+
+
+
+    <script>
+        var pages = document.querySelector('iron-pages');
+        var tabs = document.querySelector('paper-tabs');
+
+        tabs.addEventListener('iron-select', function() {
+            pages.selected = tabs.selected;
+        });
+    </script>
+
+
+    <script>
+        'use strict';
+        var leftMotorSpeed=0, rightMotorSpeed=0;
+        document.addEventListener('WebComponentsReady', () => {
+
+        let joystick = new RetroJoyStick({
+            retroStickElement: document.querySelector('#retrostick')
+        });
+
+        joystick.subscribe('change', stick => {
+
+            var y = (Math.cos(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
+            var x = (Math.sin(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
+            leftMotorSpeed = (y + x) * 127;
+            rightMotorSpeed = (y - x) * 127;
+
+            console.log( new Date().getTime() + ": " +stick.angle, stick.distance + " => " + x, y, ": " +leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+
+        });
+
+        });
+    </script>
+
+    <script>
+        var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
+        var batteryLevel = document.querySelector('platinum-bluetooth-characteristic');
+        var button = document.getElementById("connectToggle");
+
+        button.addEventListener('click', function() {
+               bluetoothDevice.request().then(function() {
+                   return batteryLevel.read().then(function(value) {
+                       var data = new DataView(value);
+                           console.log('Battery Level is ' + data.getUint8(0) + '%');
+                         });
+                   }).catch(function(error) { });
+             });
+    </script>
+</body>
+</html>
+
+<!-- Notes -->
+
+<!-- todo use vulcanise:  https://github.com/Polymer/vulcanize -->
+<!-- http://stackoverflow.com/questions/33598105/fill-page-with-iron-pages-element
+
+<!-- http://stackoverflow.com/questions/31964572/polymer-v1-0-iron-list-in-a-complex-flex-layout-is-not-visible  -->
