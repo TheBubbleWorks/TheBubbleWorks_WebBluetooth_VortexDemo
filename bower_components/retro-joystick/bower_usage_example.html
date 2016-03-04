@@ -1,0 +1,31 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Retro-Joystick</title>
+
+    <!-- cross browser web components -->
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <!-- custom hud web components -->
+    <link rel="import" href="bower_components/retro-joystick/components/retro-joystick.html" />
+
+  </head>
+  <body>
+
+  <retro-joystick></retro-joystick>
+
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      var joysticks = document.getElementsByTagName('retro-joystick');
+      if (joysticks && joysticks[0]) {
+        var joystick = joysticks[0];
+        joystick.on('change', function (stick) {
+          console.log('angle', stick.angle, 'distance', stick.distance);
+        });
+      }
+    });
+  </script>
+
+  </body>
+</html>
