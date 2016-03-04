@@ -169,8 +169,12 @@
                 <!-- Moving page -->
                 <div id="retrostick" class="retrostick">
                     <div class="retrostick-base">
-                        <div class="retrostick-base-joint"><div><div></div></div></div>
-                        <div class="retrostick-stick-wrap"><div class="retrostick-stick"></div></div>
+                        <div class="retrostick-base-joint">
+                            <div><div></div></div>
+                        </div>
+                        <div class="retrostick-stick-wrap">
+                            <div class="retrostick-stick"></div>
+                        </div>
                         <div class="retrostick-ball"></div>
                     </div>
 
@@ -183,7 +187,7 @@
 
                 <!-- emotion page -->
                 <div>
-                        <iron-ajax url="eyes.json" last-response="{{data}}" auto></iron-ajax>
+                        <iron-ajax url="conf/eyes.json" last-response="{{data}}" auto></iron-ajax>
 
                         <iron-list items="[[data]]" as="item">
                             <template>
@@ -230,6 +234,7 @@
 
         function VortexAPI() {
             var self = this;
+
             self.init = function() {
                 initVortex();
             }
@@ -237,7 +242,6 @@
             self.reset = function() {
                 resetAll();
             };
-
 
             // Shared: the 0's are dummy values ignored by the provided (from DFRobots Snap) vortex.js
 

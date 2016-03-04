@@ -1,0 +1,393 @@
+
+<!doctype html>
+<html>
+<head>
+    <title>Bluetooth Vortex</title>
+    <meta name="description" content="Control a Vortex robot with a Web Bluetooth app.">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+
+    <!-- Polyfill Web Components support for older browsers -->
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <!--<script src="bower_components/webcomponentsjs/webcomponents.js"></script>-->
+
+
+    <!-- I think we may only need this if your going to define your own components -->
+    <link rel="import" href="bower_components/polymer/polymer.html">
+
+
+    <!-- Polymer Core/'Iron' components -->
+
+    <link rel="import" href="bower_components/iron-icon/iron-icon.html">
+    <link rel="import" href="bower_components/iron-icons/iron-icons.html">
+    <link rel="import" href="bower_components/iron-pages/iron-pages.html">
+
+    <link rel="import" href="bower_components/iron-list/iron-list.html">
+    <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+
+
+    <!-- Polymer Material Design components -->
+
+    <link rel="import" href="bower_components/paper-card/paper-card.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-container.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-error.html">
+    <link rel="import" href="bower_components/paper-input/paper-input-char-counter.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
+    <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+    <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="bower_components/paper-radio-group/paper-radio-group.html">
+
+    <link rel="import" href="bower_components/paper-tabs/paper-tab.html">
+    <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+    <link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
+
+    <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+
+
+    <!-- Polymer Platinum  -->
+    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-elements.html">
+    <link rel="import" href="bower_components/platinum-https-redirect/platinum-https-redirect.html">
+
+
+
+    <!-- Vustom Elemenst. see: https://customelements.io/   -->
+
+    <link rel="import" href="bower_components/polymer-color-picker/polymer-color-picker.html">
+    <link rel="import" href="bower_components/paper-color-picker/paper-color-circle.html">
+    <link rel="import" href="bower_components/paper-color-picker/paper-color-picker.html">
+    <link rel="import" href="bower_components/paper-color-picker/paper-color-input.html">
+
+
+
+
+    <!-- joystick -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/retro-joystick/scripts/retro-joystick.js"></script>
+    <link rel="stylesheet" href="bower_components/retro-joystick/styles/retro-joystick.css">
+
+
+    <dom-module id="x-app">
+
+        <style>
+
+            body {
+                font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+                margin: 0;
+                padding: 24px;
+                color: #333;
+            }
+
+            paper-tabs, core-toolbar {
+                background-color: #00bcd4;
+                color: #fff;
+                box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.2);
+            }
+
+            core-toolbar paper-tabs {
+                box-shadow: none;
+            }
+
+            paper-tabs[noink][nobar] paper-tab.core-selected {
+                color: #ffff8d;
+            }
+
+            paper-tabs.transparent-teal {
+                background-color: transparent;
+                color: #00bcd4;
+                box-shadow: none;
+            }
+
+            paper-tabs.transparent-teal::shadow #selectionBar {
+                background-color: #00bcd4;
+            }
+
+            paper-tabs.transparent-teal paper-tab::shadow #ink {
+                color: #00bcd4;
+            }
+
+            h3 {
+                font-size: 16px;
+                font-weight: 400;
+            }
+
+        </style>
+
+
+        <style is="custom-style">
+
+            /*iron-list {
+                @apply(--layout-fit);
+            }*/
+            .item {
+                padding: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+
+        </style>
+
+
+        <template>
+
+            <paper-toolbar class="medium-tall">
+
+                <paper-icon-button icon="menu"></paper-icon-button>
+                <div flex><paper-toggle-button class="blue" id="connectToggle">Connect</paper-toggle-button></div>
+                <div flex>Vortex</div>
+                <paper-button id="send-reset-button" raised>Send Reset</paper-button>
+
+                <!--
+                <paper-icon-button icon="search"></paper-icon-button>
+                <paper-icon-button icon="more-vert"></paper-icon-button>
+                -->
+
+                <div class="bottom fit" horizontal layout>
+
+                    <paper-tabs selected="0" flex style="max-width: 600px;">
+
+                        <paper-tab>Moving</paper-tab>
+                        <paper-tab>Emotions</paper-tab>
+                        <paper-tab>Colours</paper-tab>
+
+                    </paper-tabs>
+
+                </div>
+
+            </paper-toolbar>
+
+
+            <iron-pages selected="0">
+
+                <!-- Moving page -->
+                <div id="retrostick" class="retrostick">
+                    <div class="retrostick-base">
+                        <div class="retrostick-base-joint">
+                            <div><div></div></div>
+                        </div>
+                        <div class="retrostick-stick-wrap">
+                            <div class="retrostick-stick"></div>
+                        </div>
+                        <div class="retrostick-ball"></div>
+                    </div>
+
+                    <paper-radio-group selected="dance0">
+                        <paper-radio-button name="dance0">No Dancing</paper-radio-button>
+                        <paper-radio-button name="dance1">Dance 1</paper-radio-button>
+                        <paper-radio-button name="dance2">Dance 2</paper-radio-button>
+                    </paper-radio-group>
+                </div>
+
+                <!-- emotion page -->
+                <div>
+                        <iron-ajax url="conf/eyes.json" last-response="{{data}}" auto></iron-ajax>
+
+                        <iron-list items="[[data]]" as="item">
+                            <template>
+                                <div class="item" >
+                                    <img class="avatar" src="[[item.image]]" on-tap="eyeSelected">
+
+                                    <!--
+                                    <b>#[[index]] - [[item.image]]</b>
+                                    <p>[[item.longText]]</p>
+                                    -->
+                                </div>
+                            </template>
+                        </iron-list>
+
+                </div>
+
+                <!-- Colours page -->
+                <div>
+                    <!--<polymer-color-picker color="{{selectedColor}}"></polymer-color-picker>-->
+
+                    <paper-color-input label="V Colour" shape="circle" type="hsl"></paper-color-input>
+                </div>
+            </iron-pages>
+
+
+
+            <platinum-bluetooth-device services-filter='["0000dfb0-0000-1000-8000-00805f9b34fb"]'>
+                <platinum-bluetooth-characteristic service='0000dfb0-0000-1000-8000-00805f9b34fb'
+                                                   characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'>
+                </platinum-bluetooth-characteristic>
+            </platinum-bluetooth-device>
+        </template>
+
+
+    </dom-module>
+
+
+
+
+    <script src="js/vortex.js"></script>
+
+    <script>
+        'use strict';
+
+        function VortexAPI() {
+            var self = this;
+
+            self.init = function() {
+                initVortex();
+            }
+
+            self.reset = function() {
+                resetAll();
+            };
+
+            // Shared: the 0's are dummy values ignored by the provided (from DFRobots Snap) vortex.js
+
+
+            // leftSpeed :   int,    -127 to 127
+            // rightSpeed:   int,    -127 to 127
+            self.motorSpeeds = function (leftSpeed, rightSpeed) {
+                move([0, leftSpeed, rightSpeed]);
+            };
+
+            // expression:  int,     0..33
+            // colour:      string, [red | blue | green | pink | yellow | cyan | white | off]
+            self.faceOn = function(expression, colour) {
+                face([0, expression, colour]);
+            };
+
+            self.faceOff = function(expresion, colour) {
+                face_off();
+            };
+        };
+
+
+
+        HTMLImports.whenReady(function() {
+            var connected = false;
+            var leftMotorSpeed=0, rightMotorSpeed=0;
+            var vortex = new VortexAPI();
+
+
+            Polymer({
+                is: 'x-app',
+
+                eyeSelected: function(e) {
+                    console.log(e.model.item);
+                    vortex.faceOn(e.model.item.index, "red");
+                }
+            });
+
+
+            var pages = document.querySelector('iron-pages');
+            var tabs = document.querySelector('paper-tabs');
+            var danceMoves = document.querySelector('paper-radio-group');
+
+            tabs.addEventListener('iron-select', function() {
+                pages.selected = tabs.selected;
+            });
+
+            danceMoves.addEventListener('iron-select', function() {
+                console.log("dance selected:" + danceMoves.selected);
+            });
+
+
+
+            // Bluetooth
+            var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
+            var writeCharacteristic = document.querySelector('platinum-bluetooth-characteristic');
+
+            function _send_array(byteArray) {
+                var bytes = new Uint8Array(byteArray);
+                if (connected) {
+                    writeCharacteristic.write(bytes).then(function() {});
+                } else {
+                    console.log("WARN: attempt to send while not connected: " + bytes);
+                }
+            }
+            document.writeArrayToDefaultBLECharacteristic = _send_array;
+
+            var connectButton = document.getElementById("connectToggle");
+            var resetButton = document.getElementById("send-reset-button");
+
+
+            connectButton.addEventListener('click', function() {
+                console.log("Connecting");
+
+                bluetoothDevice.request().then(function() {
+                    console.log("Connected");
+                    connected = true;
+                    vortex.init();
+                }).catch(onError);
+            });
+
+
+
+            resetButton.addEventListener('click', function() {
+                bluetoothDevice.request().then(function(device) {
+                            vortex.init();
+                            //var resetCommand = new Uint8Array([0x60]);
+                            //return writeCharacteristic.write(resetCommand).then(function() {
+                            //    console.log(device.name + ' has been reset');
+                            //})
+                        })
+                        .catch(onError);
+            });
+
+            function onError(error) {
+                console.log("ERROR: " + error);
+            }
+
+
+
+
+            let joystick = new RetroJoyStick({
+                retroStickElement: document.querySelector('#retrostick')
+            });
+
+            joystick.subscribe('change', stick => {
+
+                var y = (Math.cos(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
+            var x = (Math.sin(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
+            leftMotorSpeed = (y + x) * 127;
+            rightMotorSpeed = (y - x) * 127;
+
+            //console.log( new Date().getTime() + ": " +stick.angle, stick.distance + " => " + x, y, ": " +leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+
+        });
+
+
+            setInterval( function() {
+                if (connected) {
+                    vortex.motorSpeeds(leftMotorSpeed, rightMotorSpeed);  // 0x00 is a dummy for vortex.js
+                    //console.log(new Date().getTime() + ": " + leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+                }
+            }, 200);
+
+
+
+        }); // When Ready.
+
+    </script>
+
+
+
+</head>
+
+
+<body>
+    <platinum-https-redirect></platinum-https-redirect>
+
+    <x-app></x-app>
+
+</body>
+</html>
+
+<!-- Notes -->
+
+<!-- todo use vulcanise:  https://github.com/Polymer/vulcanize -->
+<!-- http://stackoverflow.com/questions/33598105/fill-page-with-iron-pages-element
+
+<!-- http://stackoverflow.com/questions/31964572/polymer-v1-0-iron-list-in-a-complex-flex-layout-is-not-visible  -->
