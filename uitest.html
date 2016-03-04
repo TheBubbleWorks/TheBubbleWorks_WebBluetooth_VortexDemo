@@ -27,6 +27,10 @@
     <link rel="import" href="bower_components/iron-icons/iron-icons.html">
     <link rel="import" href="bower_components/iron-pages/iron-pages.html">
 
+    <link rel="import" href="bower_components/iron-list/iron-list.html">
+    <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+
 
     <!-- Polymer Material Design components -->
 
@@ -40,6 +44,7 @@
     <link rel="import" href="bower_components/paper-progress/paper-progress.html">
     <link rel="import" href="bower_components/paper-slider/paper-slider.html">
     <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="bower_components/paper-radio-group/paper-radio-group.html">
 
     <link rel="import" href="bower_components/paper-tabs/paper-tab.html">
     <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
@@ -50,6 +55,14 @@
 
     <!-- Polymer Platinum  -->
     <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-elements.html">
+
+
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/retro-joystick/scripts/retro-joystick.js"></script>
+    <link rel="stylesheet" href="bower_components/retro-joystick/styles/retro-joystick.css">
+
+
+<dom-module id="x-app">
 
     <style>
 
@@ -96,16 +109,20 @@
     </style>
 
 
+    <style is="custom-style">
+
+        /*iron-list {
+            @apply(--layout-fit);
+        }*/
+        .item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+    </style>
 
 
-    <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="bower_components/retro-joystick/scripts/retro-joystick.js"></script>
-
-    <link rel="stylesheet" href="bower_components/retro-joystick/styles/retro-joystick.css">
-
-</head>
-<body unresolved>
-
+    <template>
 
     <paper-toolbar class="medium-tall">
 
@@ -136,110 +153,186 @@
 
     <iron-pages selected="0">
 
-            <div id="retrostick" class="retrostick">
-                <div class="retrostick-base">
-                    <div class="retrostick-base-joint"></div>
+        <!-- Moving page -->
+        <div id="retrostick" class="retrostick">
+            <div class="retrostick-base">
+                <div class="retrostick-base-joint"><div><div></div></div></div>
+                <div class="retrostick-stick-wrap"><div class="retrostick-stick"></div></div>
+                <div class="retrostick-ball"></div>
+            </div>
 
-                    <div class="retrostick-stick-wrap">
-                        <div class="retrostick-stick"></div>
-                    </div>
-                    <div class="retrostick-ball"></div>
-                </div>
+            <paper-radio-group selected="dance0">
+                <paper-radio-button name="dance0">No Dancing</paper-radio-button>
+                <paper-radio-button name="dance1">Dance 1</paper-radio-button>
+                <paper-radio-button name="dance2">Dance 2</paper-radio-button>
+            </paper-radio-group>
+        </div>
+
+        <!-- emotion page -->
+        <div>
+                <iron-ajax url="eyes.json" last-response="{{data}}" auto></iron-ajax>
+
+                <iron-list items="[[data]]" as="item">
+                    <template>
+                        <div class="item" >
+                            <img class="avatar" src="[[item.image]]" on-tap="eyeSelected">
+
+                            <!--
+                            <b>#[[index]] - [[item.image]]</b>
+                            <p>[[item.longText]]</p>
+                            -->
+                        </div>
+                    </template>
+                </iron-list>
+
+        </div>
+
+        <!-- Colours page -->
+        <div>
+
         </div>
     </iron-pages>
 
-
-    <platinum-bluetooth-device services-filter='["0000dfb0-0000-1000-8000-00805f9b34fb"]'>
-        <!--<platinum-bluetooth-characteristic service='heart_rate' characteristic='heart_rate_control_point'>
-        </platinum-bluetooth-characteristic>-->
-        <platinum-bluetooth-characteristic service='0000dfb0-0000-1000-8000-00805f9b34fb'
-                                           characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'
-                                           on-value-changed='parseHeartRate'>
-        </platinum-bluetooth-characteristic>
-    </platinum-bluetooth-device>
+        <platinum-bluetooth-device services-filter='["0000dfb0-0000-1000-8000-00805f9b34fb"]'>
+            <platinum-bluetooth-characteristic service='0000dfb0-0000-1000-8000-00805f9b34fb'
+                                               characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'>
+            </platinum-bluetooth-characteristic>
+        </platinum-bluetooth-device>
+    </template>
 
 
+</dom-module>
 
-    <script>
-        var pages = document.querySelector('iron-pages');
-        var tabs = document.querySelector('paper-tabs');
-
-        tabs.addEventListener('iron-select', function() {
-            pages.selected = tabs.selected;
-        });
-    </script>
 
 
     <script>
         'use strict';
+
+        HTMLImports.whenReady(function() {
+
+            Polymer({
+                is: 'x-app',
+
+                eyeSelected: function(e) {
+                    console.log(e.model.item);
+                }
+            });
+
+
+            var pages = document.querySelector('iron-pages');
+            var tabs = document.querySelector('paper-tabs');
+            var danceMoves = document.querySelector('paper-radio-group');
+
+            tabs.addEventListener('iron-select', function() {
+                pages.selected = tabs.selected;
+            });
+
+            danceMoves.addEventListener('iron-select', function() {
+                console.log("dance selected:" + danceMoves.selected);
+            });
+
+
+
+            // Bluetooth
+            var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
+            var writeCharacteristic = document.querySelector('platinum-bluetooth-characteristic');
+
+            var connectButton = document.getElementById("connectToggle");
+            var resetButton = document.getElementById("send-reset-button");
+
+
+            connectButton.addEventListener('click', function() {
+                console.log("Connecting");
+
+                bluetoothDevice.request().then(function() {
+                    console.log("Connected");
+                    connected = true;
+                }).catch(onError);
+            });
+
+
+
+            resetButton.addEventListener('click', function() {
+                bluetoothDevice.request().then(function(device) {
+                            // Writing 1 is the signal to reset energy expended.
+                            var resetCommand = new Uint8Array([0x60]);
+                            return writeCharacteristic.write(resetCommand).then(function() {
+                                console.log(device.name + ' has been reset');
+                            })
+                        })
+                        .catch(onError);
+            });
+
+            function onError(error) {
+                //template.text = 'Argh! ' + error;
+                //progressBar.indeterminate = false;
+                console.log("ERROR: " + error);
+            }
+
+
+        });
+
+    </script>
+
+
+
+
+
+
+
+
+    <script>
+        'use strict';
+        var connected = false;
         var leftMotorSpeed=0, rightMotorSpeed=0;
         document.addEventListener('WebComponentsReady', () => {
 
-        let joystick = new RetroJoyStick({
-            retroStickElement: document.querySelector('#retrostick')
-        });
+            let joystick = new RetroJoyStick({
+                retroStickElement: document.querySelector('#retrostick')
+            });
 
         joystick.subscribe('change', stick => {
 
             var y = (Math.cos(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
-            var x = (Math.sin(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
-            leftMotorSpeed = (y + x) * 127;
-            rightMotorSpeed = (y - x) * 127;
+        var x = (Math.sin(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
+        leftMotorSpeed = (y + x) * 127;
+        rightMotorSpeed = (y - x) * 127;
 
-            console.log( new Date().getTime() + ": " +stick.angle, stick.distance + " => " + x, y, ": " +leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+        //console.log( new Date().getTime() + ": " +stick.angle, stick.distance + " => " + x, y, ": " +leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+
+        });
 
         });
 
-        });
+
+        setInterval( function() {
+            if (connected) {
+                move([0x00, leftMotorSpeed, rightMotorSpeed]);  // 0x00 is a dummy for vortex.js
+                //console.log(new Date().getTime() + ": " + leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+            }
+        }, 200);
+
+
+        function _send_array(byteArray) {
+            var bytes = new Uint8Array(byteArray);
+            if (connected) {
+                writeCharacteristic.write(bytes).then(function() {});
+            } else {
+                console.log("WARN: attempt to send while not connected: " + bytes);
+            }
+        }
     </script>
 
 
+    <script src="js/vortex.js"></script>
 
 
-
-    <script>
-        'use strict';
-        var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
-        var writeCharacteristic = document.querySelector('platinum-bluetooth-characteristic');
+</head>
 
 
-        var connectButton = document.getElementById("connectToggle");
-        var resetButton = document.getElementById("send-reset-button");
+<body>
+    <x-app></x-app>
 
-        function parseHeartRate(event) {
-            let value = event.target.value;
-            console.log("Got Heart rate: " + value);
-        }
-
-
-        connectButton.addEventListener('click', function() {
-            console.log("Connecting");
-
-            bluetoothDevice.request().then(function() {
-                    console.log("Connected");
-               });
-             });
-
-
-
-        resetButton.addEventListener('click', function() {
-            bluetoothDevice.request().then(function(device) {
-                        // Writing 1 is the signal to reset energy expended.
-                        var resetCommand = new Uint8Array([0x60]);
-                        return writeCharacteristic.write(resetCommand).then(function() {
-                            console.log(device.name + ' has been reset');
-                        })
-                    })
-                    .catch(onError);
-        });
-
-        function onError(error) {
-            //template.text = 'Argh! ' + error;
-            //progressBar.indeterminate = false;
-            console.log("ERROR: " + error);
-        }
-
-    </script>
 </body>
 </html>
 

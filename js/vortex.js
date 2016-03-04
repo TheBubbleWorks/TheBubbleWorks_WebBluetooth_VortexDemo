@@ -592,7 +592,8 @@ function sendData(data, slient){
 	//io.write(new Buffer(data.concat("\n")));
 	// io.write(new Buffer(data));
 
-    sendMessage(create_message_from_int8array(data));
+    //sendMessage(create_message_from_int8array(data));
+	_send_array(data);
 
 }
 
