@@ -221,16 +221,58 @@
     </dom-module>
 
 
+
+
+    <script src="js/vortex.js"></script>
+
     <script>
         'use strict';
 
+        function VortexAPI() {
+            var self = this;
+            self.init = function() {
+                initVortex();
+            }
+
+            self.reset = function() {
+                resetAll();
+            };
+
+
+            // Shared: the 0's are dummy values ignored by the provided (from DFRobots Snap) vortex.js
+
+
+            // leftSpeed :   int,    -127 to 127
+            // rightSpeed:   int,    -127 to 127
+            self.motorSpeeds = function (leftSpeed, rightSpeed) {
+                move([0, leftSpeed, rightSpeed]);
+            };
+
+            // expression:  int,     0..33
+            // colour:      string, [red | blue | green | pink | yellow | cyan | white | off]
+            self.faceOn = function(expression, colour) {
+                face([0, expression, colour]);
+            };
+
+            self.faceOff = function(expresion, colour) {
+                face_off();
+            };
+        };
+
+
+
         HTMLImports.whenReady(function() {
+            var connected = false;
+            var leftMotorSpeed=0, rightMotorSpeed=0;
+            var vortex = new VortexAPI();
+
 
             Polymer({
                 is: 'x-app',
 
                 eyeSelected: function(e) {
                     console.log(e.model.item);
+                    vortex.faceOn(e.model.item.index, "red");
                 }
             });
 
@@ -253,6 +295,16 @@
             var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
             var writeCharacteristic = document.querySelector('platinum-bluetooth-characteristic');
 
+            function _send_array(byteArray) {
+                var bytes = new Uint8Array(byteArray);
+                if (connected) {
+                    writeCharacteristic.write(bytes).then(function() {});
+                } else {
+                    console.log("WARN: attempt to send while not connected: " + bytes);
+                }
+            }
+            document.writeArrayToDefaultBLECharacteristic = _send_array;
+
             var connectButton = document.getElementById("connectToggle");
             var resetButton = document.getElementById("send-reset-button");
 
@@ -263,6 +315,7 @@
                 bluetoothDevice.request().then(function() {
                     console.log("Connected");
                     connected = true;
+                    vortex.init();
                 }).catch(onError);
             });
 
@@ -270,77 +323,51 @@
 
             resetButton.addEventListener('click', function() {
                 bluetoothDevice.request().then(function(device) {
-                            // Writing 1 is the signal to reset energy expended.
-                            var resetCommand = new Uint8Array([0x60]);
-                            return writeCharacteristic.write(resetCommand).then(function() {
-                                console.log(device.name + ' has been reset');
-                            })
+                            vortex.init();
+                            //var resetCommand = new Uint8Array([0x60]);
+                            //return writeCharacteristic.write(resetCommand).then(function() {
+                            //    console.log(device.name + ' has been reset');
+                            //})
                         })
                         .catch(onError);
             });
 
             function onError(error) {
-                //template.text = 'Argh! ' + error;
-                //progressBar.indeterminate = false;
                 console.log("ERROR: " + error);
             }
 
 
-        });
 
-    </script>
-
-
-
-
-
-
-
-
-    <script>
-        'use strict';
-        var connected = false;
-        var leftMotorSpeed=0, rightMotorSpeed=0;
-        document.addEventListener('WebComponentsReady', () => {
 
             let joystick = new RetroJoyStick({
                 retroStickElement: document.querySelector('#retrostick')
             });
 
-        joystick.subscribe('change', stick => {
+            joystick.subscribe('change', stick => {
 
-            var y = (Math.cos(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
-        var x = (Math.sin(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
-        leftMotorSpeed = (y + x) * 127;
-        rightMotorSpeed = (y - x) * 127;
+                var y = (Math.cos(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
+            var x = (Math.sin(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
+            leftMotorSpeed = (y + x) * 127;
+            rightMotorSpeed = (y - x) * 127;
 
-        //console.log( new Date().getTime() + ": " +stick.angle, stick.distance + " => " + x, y, ": " +leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
-
-        });
+            //console.log( new Date().getTime() + ": " +stick.angle, stick.distance + " => " + x, y, ": " +leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
 
         });
 
 
-        setInterval( function() {
-            if (connected) {
-                move([0x00, leftMotorSpeed, rightMotorSpeed]);  // 0x00 is a dummy for vortex.js
-                //console.log(new Date().getTime() + ": " + leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
-            }
-        }, 200);
+            setInterval( function() {
+                if (connected) {
+                    vortex.motorSpeeds(leftMotorSpeed, rightMotorSpeed);  // 0x00 is a dummy for vortex.js
+                    //console.log(new Date().getTime() + ": " + leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+                }
+            }, 200);
 
 
-        function _send_array(byteArray) {
-            var bytes = new Uint8Array(byteArray);
-            if (connected) {
-                writeCharacteristic.write(bytes).then(function() {});
-            } else {
-                console.log("WARN: attempt to send while not connected: " + bytes);
-            }
-        }
+
+        }); // When Ready.
+
     </script>
 
-
-    <script src="js/vortex.js"></script>
 
 
 </head>

@@ -10,7 +10,7 @@ var startTimer;
 
 // TODO: RX, listen notification, when  the Chrom broswr on android supports it.
 //             io.on('data', processData);
-setTimeout(initVortex, 3000);
+//setTimeout(initVortex, 3000);
 
 
 
@@ -593,7 +593,8 @@ function sendData(data, slient){
 	// io.write(new Buffer(data));
 
     //sendMessage(create_message_from_int8array(data));
-	_send_array(data);
+	// TODO: what's a better way to inject this...
+	document.writeArrayToDefaultBLECharacteristic(data);
 
 }
 
