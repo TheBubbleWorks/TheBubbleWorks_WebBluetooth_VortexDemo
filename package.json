@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://waynek@bitbucket.org/thebubbleworks/bubble_javascript_bleuart"
+    "url": "https://github.com/TheBubbleWorks/test.git"
   },
   "main": "index.html",
   "scripts": {

@@ -35,6 +35,7 @@ module.exports = function(grunt) {
                     hostname: '*',
                     port: 3141,
                     protocol: 'https',
+                    // Only need these if you want to overide the built-in self-signed certificate
                     //key: grunt.file.read('server.key').toString(),
                     //cert: grunt.file.read('server.crt').toString(),
                     //ca: grunt.file.read('ca.crt').toString(),
@@ -64,5 +65,7 @@ module.exports = function(grunt) {
     // Default task(s).
     grunt.registerTask('default', ['clean',  'copy', 'vulcanize' ]); //'connect:server']);
 
+
+    // push to github pahgeS:  grunt gh-pages
 
 };
