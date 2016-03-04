@@ -55,6 +55,8 @@
 
     <!-- Polymer Platinum  -->
     <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-elements.html">
+    <link rel="import" href="bower_components/platinum-https-redirect/platinum-https-redirect.html">
+
 
 
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
@@ -62,147 +64,148 @@
     <link rel="stylesheet" href="bower_components/retro-joystick/styles/retro-joystick.css">
 
 
-<dom-module id="x-app">
+    <dom-module id="x-app">
 
-    <style>
+        <style>
 
-        body {
-            font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
-            margin: 0;
-            padding: 24px;
-            color: #333;
-        }
+            body {
+                font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+                margin: 0;
+                padding: 24px;
+                color: #333;
+            }
 
-        paper-tabs, core-toolbar {
-            background-color: #00bcd4;
-            color: #fff;
-            box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.2);
-        }
+            paper-tabs, core-toolbar {
+                background-color: #00bcd4;
+                color: #fff;
+                box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.2);
+            }
 
-        core-toolbar paper-tabs {
-            box-shadow: none;
-        }
+            core-toolbar paper-tabs {
+                box-shadow: none;
+            }
 
-        paper-tabs[noink][nobar] paper-tab.core-selected {
-            color: #ffff8d;
-        }
+            paper-tabs[noink][nobar] paper-tab.core-selected {
+                color: #ffff8d;
+            }
 
-        paper-tabs.transparent-teal {
-            background-color: transparent;
-            color: #00bcd4;
-            box-shadow: none;
-        }
+            paper-tabs.transparent-teal {
+                background-color: transparent;
+                color: #00bcd4;
+                box-shadow: none;
+            }
 
-        paper-tabs.transparent-teal::shadow #selectionBar {
-            background-color: #00bcd4;
-        }
+            paper-tabs.transparent-teal::shadow #selectionBar {
+                background-color: #00bcd4;
+            }
 
-        paper-tabs.transparent-teal paper-tab::shadow #ink {
-            color: #00bcd4;
-        }
+            paper-tabs.transparent-teal paper-tab::shadow #ink {
+                color: #00bcd4;
+            }
 
-        h3 {
-            font-size: 16px;
-            font-weight: 400;
-        }
+            h3 {
+                font-size: 16px;
+                font-weight: 400;
+            }
 
-    </style>
-
-
-    <style is="custom-style">
-
-        /*iron-list {
-            @apply(--layout-fit);
-        }*/
-        .item {
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-
-    </style>
+        </style>
 
 
-    <template>
+        <style is="custom-style">
 
-    <paper-toolbar class="medium-tall">
+            /*iron-list {
+                @apply(--layout-fit);
+            }*/
+            .item {
+                padding: 10px;
+                border-bottom: 1px solid #ccc;
+            }
 
-        <paper-icon-button icon="menu"></paper-icon-button>
-        <div flex><paper-toggle-button class="blue" id="connectToggle">Connect</paper-toggle-button></div>
-        <div flex>Vortex</div>
-        <paper-button id="send-reset-button" raised>Send Reset</paper-button>
-
-        <!--
-        <paper-icon-button icon="search"></paper-icon-button>
-        <paper-icon-button icon="more-vert"></paper-icon-button>
-        -->
-
-        <div class="bottom fit" horizontal layout>
-
-            <paper-tabs selected="0" flex style="max-width: 600px;">
-
-                <paper-tab>Moving</paper-tab>
-                <paper-tab>Emotions</paper-tab>
-                <paper-tab>Colours</paper-tab>
-
-            </paper-tabs>
-
-        </div>
-
-    </paper-toolbar>
+        </style>
 
 
-    <iron-pages selected="0">
+        <template>
 
-        <!-- Moving page -->
-        <div id="retrostick" class="retrostick">
-            <div class="retrostick-base">
-                <div class="retrostick-base-joint"><div><div></div></div></div>
-                <div class="retrostick-stick-wrap"><div class="retrostick-stick"></div></div>
-                <div class="retrostick-ball"></div>
-            </div>
+            <paper-toolbar class="medium-tall">
 
-            <paper-radio-group selected="dance0">
-                <paper-radio-button name="dance0">No Dancing</paper-radio-button>
-                <paper-radio-button name="dance1">Dance 1</paper-radio-button>
-                <paper-radio-button name="dance2">Dance 2</paper-radio-button>
-            </paper-radio-group>
-        </div>
+                <paper-icon-button icon="menu"></paper-icon-button>
+                <div flex><paper-toggle-button class="blue" id="connectToggle">Connect</paper-toggle-button></div>
+                <div flex>Vortex</div>
+                <paper-button id="send-reset-button" raised>Send Reset</paper-button>
 
-        <!-- emotion page -->
-        <div>
-                <iron-ajax url="eyes.json" last-response="{{data}}" auto></iron-ajax>
+                <!--
+                <paper-icon-button icon="search"></paper-icon-button>
+                <paper-icon-button icon="more-vert"></paper-icon-button>
+                -->
 
-                <iron-list items="[[data]]" as="item">
-                    <template>
-                        <div class="item" >
-                            <img class="avatar" src="[[item.image]]" on-tap="eyeSelected">
+                <div class="bottom fit" horizontal layout>
 
-                            <!--
-                            <b>#[[index]] - [[item.image]]</b>
-                            <p>[[item.longText]]</p>
-                            -->
-                        </div>
-                    </template>
-                </iron-list>
+                    <paper-tabs selected="0" flex style="max-width: 600px;">
 
-        </div>
+                        <paper-tab>Moving</paper-tab>
+                        <paper-tab>Emotions</paper-tab>
+                        <paper-tab>Colours</paper-tab>
 
-        <!-- Colours page -->
-        <div>
+                    </paper-tabs>
 
-        </div>
-    </iron-pages>
+                </div>
 
-        <platinum-bluetooth-device services-filter='["0000dfb0-0000-1000-8000-00805f9b34fb"]'>
-            <platinum-bluetooth-characteristic service='0000dfb0-0000-1000-8000-00805f9b34fb'
-                                               characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'>
-            </platinum-bluetooth-characteristic>
-        </platinum-bluetooth-device>
-    </template>
+            </paper-toolbar>
 
 
-</dom-module>
+            <iron-pages selected="0">
 
+                <!-- Moving page -->
+                <div id="retrostick" class="retrostick">
+                    <div class="retrostick-base">
+                        <div class="retrostick-base-joint"><div><div></div></div></div>
+                        <div class="retrostick-stick-wrap"><div class="retrostick-stick"></div></div>
+                        <div class="retrostick-ball"></div>
+                    </div>
+
+                    <paper-radio-group selected="dance0">
+                        <paper-radio-button name="dance0">No Dancing</paper-radio-button>
+                        <paper-radio-button name="dance1">Dance 1</paper-radio-button>
+                        <paper-radio-button name="dance2">Dance 2</paper-radio-button>
+                    </paper-radio-group>
+                </div>
+
+                <!-- emotion page -->
+                <div>
+                        <iron-ajax url="eyes.json" last-response="{{data}}" auto></iron-ajax>
+
+                        <iron-list items="[[data]]" as="item">
+                            <template>
+                                <div class="item" >
+                                    <img class="avatar" src="[[item.image]]" on-tap="eyeSelected">
+
+                                    <!--
+                                    <b>#[[index]] - [[item.image]]</b>
+                                    <p>[[item.longText]]</p>
+                                    -->
+                                </div>
+                            </template>
+                        </iron-list>
+
+                </div>
+
+                <!-- Colours page -->
+                <div>
+
+                </div>
+            </iron-pages>
+
+
+
+            <platinum-bluetooth-device services-filter='["0000dfb0-0000-1000-8000-00805f9b34fb"]'>
+                <platinum-bluetooth-characteristic service='0000dfb0-0000-1000-8000-00805f9b34fb'
+                                                   characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'>
+                </platinum-bluetooth-characteristic>
+            </platinum-bluetooth-device>
+        </template>
+
+
+    </dom-module>
 
 
     <script>
@@ -331,6 +334,8 @@
 
 
 <body>
+    <platinum-https-redirect></platinum-https-redirect>
+
     <x-app></x-app>
 
 </body>
