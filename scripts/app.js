@@ -170,6 +170,7 @@ function onReady() {
 
 
     function bluetooth_connected() {
+        connected=true;
         vortex.init();
         setInterval( function() {
             if (connected) {
