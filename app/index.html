@@ -1,0 +1,162 @@
+
+<!doctype html>
+<html>
+<head>
+    <title>Bluetooth Vortex</title>
+    <meta name="description" content="Control a Vortex robot with a Web Bluetooth app.">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <!-- Polyfill Web Components support for older browsers -->
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+    <!-- Because this project uses vulcanize this should be your only html import
+     in this file. All other imports should go in elements.html -->
+    <link rel="import" href="elements/elements.html">
+
+    <link rel="stylesheet" href="bower_components/retro-joystick/styles/retro-joystick.css">
+
+
+    <script src="scripts/vortex.js"></script>
+    <script src="scripts/app.js"></script>
+<!--
+    <script>
+        (function() {
+            'use strict';
+
+            function lazyLoadWCPolyfillsIfNecessary() {
+                var onload = function() {
+                    // For native Imports, manually fire WCR so user code
+                    // can use the same code path for native and polyfill'd imports.
+                    if (!window.HTMLImports) {
+                        document.dispatchEvent(
+                                new CustomEvent('WebComponentsReady', {bubbles: true}));
+                    }
+                };
+
+                var webComponentsSupported = (
+                'registerElement' in document
+                && 'import' in document.createElement('link')
+                && 'content' in document.createElement('template'));
+                if (!webComponentsSupported) {
+                    var script = document.createElement('script');
+                    script.async = true;
+                    script.src = 'webcomponentsjs/webcomponents-lite.min.js';
+                    script.onload = onload;
+                    document.head.appendChild(script);
+                } else {
+                    onload();
+                }
+            }
+
+
+            lazyLoadWCPolyfillsIfNecessary();
+        })();
+    </script>
+    -->
+
+<body>
+    <platinum-https-redirect></platinum-https-redirect>
+
+    <template is="dom-bind" id="my-app">
+
+        <paper-toolbar class="medium-tall">
+
+            <paper-icon-button icon="menu"></paper-icon-button>
+            <div flex><paper-toggle-button class="blue" id="connectToggle">Connect</paper-toggle-button></div>
+            <div flex>Vortex</div>
+            <paper-button id="send-reset-button" raised>Send Reset</paper-button>
+
+            <!--
+            <paper-icon-button icon="search"></paper-icon-button>
+            <paper-icon-button icon="more-vert"></paper-icon-button>
+            -->
+
+            <div class="bottom fit" horizontal layout>
+
+                <paper-tabs selected="0" flex style="max-width: 600px;">
+
+                    <paper-tab>Moving</paper-tab>
+                    <paper-tab>Emotions</paper-tab>
+                    <paper-tab>Colours</paper-tab>
+
+                </paper-tabs>
+
+            </div>
+
+        </paper-toolbar>
+
+        <iron-pages selected="0">
+
+            <!-- Moving page -->
+            <div id="retrostick" class="retrostick">
+                <div class="retrostick-base">
+                    <div class="retrostick-base-joint">
+                        <div><div></div></div>
+                    </div>
+                    <div class="retrostick-stick-wrap">
+                        <div class="retrostick-stick"></div>
+                    </div>
+                    <div class="retrostick-ball"></div>
+                </div>
+
+                <paper-radio-group selected="danceOff">
+                    <paper-radio-button name="danceOff">No Dancing</paper-radio-button>
+                    <paper-radio-button name="dance1">Dance 1</paper-radio-button>
+                    <paper-radio-button name="dance2">Dance 2</paper-radio-button>
+                    <paper-radio-button name="dance3">Dance 3</paper-radio-button>
+                    <paper-radio-button name="dance4">Dance 4</paper-radio-button>
+                </paper-radio-group>
+            </div>
+
+            <!-- emotion page -->
+            <div>
+                    <iron-ajax url="conf/eyes.json" last-response="{{data}}" auto></iron-ajax>
+
+                    <iron-list items="[[data]]" as="item">
+                        <template>
+                            <div class="item" >
+                                <img class="avatar" src="[[item.image]]" on-tap="eyeSelected">
+
+                                <!--
+                                <b>#[[index]] - [[item.image]]</b>
+                                <p>[[item.longText]]</p>
+                                -->
+                            </div>
+                        </template>
+                    </iron-list>
+
+            </div>
+
+            <!-- Colours page -->
+            <div>
+                <!--<polymer-color-picker color="{{selectedColor}}"></polymer-color-picker>-->
+
+                <paper-color-input label="Top Colour" shape="circle" type="hsl"></paper-color-input>
+            </div>
+        </iron-pages>
+
+
+
+        <platinum-bluetooth-device services-filter='["0000dfb0-0000-1000-8000-00805f9b34fb"]'>
+            <platinum-bluetooth-characteristic service='0000dfb0-0000-1000-8000-00805f9b34fb'
+                                               characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'>
+            </platinum-bluetooth-characteristic>
+        </platinum-bluetooth-device>
+    </template>
+
+
+</head>
+
+</body>
+</html>
+
+<!-- Notes -->
+
+<!-- http://stackoverflow.com/questions/33598105/fill-page-with-iron-pages-element
+
+<!-- http://stackoverflow.com/questions/31964572/polymer-v1-0-iron-list-in-a-complex-flex-layout-is-not-visible  -->

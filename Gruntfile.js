@@ -9,16 +9,16 @@ module.exports = function(grunt) {
         copy: {
             all: {
                 expand: true,
-                cwd: "src/",
-                src: ['*.css', 'images/**/*', 'img/**/*', '!Gruntfile.js', 'conf/**/*', 'js/**/*', '*.html'],
+                cwd: "app/",
+                src: ['*.css', 'images/**/*', 'img/**/*', '!Gruntfile.js', 'conf/**/*', 'scripts/**/*', 'elements/**/*', 'styles/**/*', '*.html'],
                 dest: 'dist/',
             },
 
             bower: {
                 expand: true,
-                cwd: "bower_components",
+                cwd: "app/bower_components",
                 src: ['**/*'],
-                dest: 'dist/lib',
+                dest: 'dist/bower_components',
             },
         },
 
@@ -39,7 +39,7 @@ module.exports = function(grunt) {
             options: {
                 livereload: true,
             },
-            files: ['src/**/*'],
+            files: ['app/**/*'],
             tasks: ['default'],
         },
 
@@ -68,15 +68,15 @@ module.exports = function(grunt) {
 	});
 
 
+    // Find the development onlt grunt-* dependencies from package.json
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
     // The above replaces lots of manual entries:
-    //grunt.loadNpmTasks('grunt-contrib-connect');
-    //grunt.loadNpmTasks('grunt-...
+    //grunt.loadNpmTasks('grunt-contrib-connect')  etc.
 
 
     grunt.registerTask('default', ['clean',  'copy']); //, 'vulcanize']);
     grunt.registerTask('dev', ['watch']);
-    grunt.registerTask('run', ['connect:server']);
-    grunt.registerTask('publish', ['gh-pages']);
+    grunt.registerTask('serve', ['connect:server']);
+    grunt.registerTask('publish', ['default', 'gh-pages']);
 
 };
