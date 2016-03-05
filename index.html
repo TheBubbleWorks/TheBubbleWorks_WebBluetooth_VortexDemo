@@ -14,7 +14,6 @@
 
     <!-- Polyfill Web Components support for older browsers -->
     <script src="lib/webcomponentsjs/webcomponents-lite.min.js"></script>
-    <!--<script src="bower_components/webcomponentsjs/webcomponents.js"></script>-->
 
 
     <!-- I think we may only need this if your going to define your own components -->
@@ -26,10 +25,9 @@
     <link rel="import" href="lib/iron-icon/iron-icon.html">
     <link rel="import" href="lib/iron-icons/iron-icons.html">
     <link rel="import" href="lib/iron-pages/iron-pages.html">
-
     <link rel="import" href="lib/iron-list/iron-list.html">
-    <link rel="import" href="lib/iron-flex-layout/iron-flex-layout.html">
     <link rel="import" href="lib/iron-ajax/iron-ajax.html">
+    <link rel="import" href="lib/iron-flex-layout/iron-flex-layout.html">
 
 
     <!-- Polymer Material Design components -->
@@ -48,14 +46,9 @@
     <link rel="import" href="lib/platinum-https-redirect/platinum-https-redirect.html">
 
 
-
     <!-- Custom Elements. see: https://customelements.io/   -->
 
-    <link rel="import" href="lib/polymer-color-picker/polymer-color-picker.html">
-    <link rel="import" href="lib/paper-color-picker/paper-color-circle.html">
-    <link rel="import" href="lib/paper-color-picker/paper-color-picker.html">
     <link rel="import" href="lib/paper-color-picker/paper-color-input.html">
-
 
 
 
@@ -153,7 +146,6 @@
 
             </paper-toolbar>
 
-
             <iron-pages selected="0">
 
                 <!-- Moving page -->
@@ -168,10 +160,12 @@
                         <div class="retrostick-ball"></div>
                     </div>
 
-                    <paper-radio-group selected="dance0">
-                        <paper-radio-button name="dance0">No Dancing</paper-radio-button>
+                    <paper-radio-group selected="danceOff">
+                        <paper-radio-button name="danceOff">No Dancing</paper-radio-button>
                         <paper-radio-button name="dance1">Dance 1</paper-radio-button>
                         <paper-radio-button name="dance2">Dance 2</paper-radio-button>
+                        <paper-radio-button name="dance3">Dance 3</paper-radio-button>
+                        <paper-radio-button name="dance4">Dance 4</paper-radio-button>
                     </paper-radio-group>
                 </div>
 
@@ -198,7 +192,7 @@
                 <div>
                     <!--<polymer-color-picker color="{{selectedColor}}"></polymer-color-picker>-->
 
-                    <paper-color-input label="V Colour" shape="circle" type="hsl"></paper-color-input>
+                    <paper-color-input label="Top Colour" shape="circle" type="hsl"></paper-color-input>
                 </div>
             </iron-pages>
 
@@ -214,167 +208,19 @@
 
     </dom-module>
 
-
-
-
-    <script src="js/vortex.js"></script>
-
-    <script>
-        'use strict';
-
-        function VortexAPI() {
-            var self = this;
-
-            self.init = function() {
-                initVortex();
-            }
-
-            self.reset = function() {
-                resetAll();
-            };
-
-            // Shared: the 0's are dummy values ignored by the provided (from DFRobots Snap) vortex.js
-
-
-            // leftSpeed :   int,    -127 to 127
-            // rightSpeed:   int,    -127 to 127
-            self.motorSpeeds = function (leftSpeed, rightSpeed) {
-                move([0, leftSpeed, rightSpeed]);
-            };
-
-            // expression:  int,     0..33
-            // colour:      string, [red | blue | green | pink | yellow | cyan | white | off]
-            self.faceOn = function(expression, colour) {
-                face([0, expression, colour]);
-            };
-
-            self.faceOff = function(expresion, colour) {
-                face_off();
-            };
-        };
-
-
-
-        HTMLImports.whenReady(function() {
-            var connected = false;
-            var leftMotorSpeed=0, rightMotorSpeed=0;
-            var vortex = new VortexAPI();
-
-
-            Polymer({
-                is: 'x-app',
-
-                eyeSelected: function(e) {
-                    console.log(e.model.item);
-                    vortex.faceOn(e.model.item.index, "red");
-                }
-            });
-
-
-            var pages = document.querySelector('iron-pages');
-            var tabs = document.querySelector('paper-tabs');
-            var danceMoves = document.querySelector('paper-radio-group');
-
-            tabs.addEventListener('iron-select', function() {
-                pages.selected = tabs.selected;
-            });
-
-            danceMoves.addEventListener('iron-select', function() {
-                console.log("dance selected:" + danceMoves.selected);
-            });
-
-
-
-            // Bluetooth
-            var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
-            var writeCharacteristic = document.querySelector('platinum-bluetooth-characteristic');
-
-            function _send_array(byteArray) {
-                var bytes = new Uint8Array(byteArray);
-                if (connected) {
-                    writeCharacteristic.write(bytes).then(function() {});
-                } else {
-                    console.log("WARN: attempt to send while not connected: " + bytes);
-                }
-            }
-            document.writeArrayToDefaultBLECharacteristic = _send_array;
-
-            var connectButton = document.getElementById("connectToggle");
-            var resetButton = document.getElementById("send-reset-button");
-
-
-            connectButton.addEventListener('click', function() {
-                console.log("Connecting");
-
-                bluetoothDevice.request().then(function() {
-                    console.log("Connected");
-                    connected = true;
-                    vortex.init();
-                }).catch(onError);
-            });
-
-
-
-            resetButton.addEventListener('click', function() {
-                bluetoothDevice.request().then(function(device) {
-                            vortex.init();
-                            //var resetCommand = new Uint8Array([0x60]);
-                            //return writeCharacteristic.write(resetCommand).then(function() {
-                            //    console.log(device.name + ' has been reset');
-                            //})
-                        })
-                        .catch(onError);
-            });
-
-            function onError(error) {
-                console.log("ERROR: " + error);
-            }
-
-
-
-            let joystick = new RetroJoyStick({
-                retroStickElement: document.querySelector('#retrostick')
-            });
-
-            joystick.subscribe('change', stick => {
-
-                var y = (Math.cos(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
-            var x = (Math.sin(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
-            leftMotorSpeed = (y + x) * 127;
-            rightMotorSpeed = (y - x) * 127;
-
-            //console.log( new Date().getTime() + ": " +stick.angle, stick.distance + " => " + x, y, ": " +leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
-
-        });
-
-
-            setInterval( function() {
-                if (connected) {
-                    vortex.motorSpeeds(leftMotorSpeed, rightMotorSpeed);  // 0x00 is a dummy for vortex.js
-                    //console.log(new Date().getTime() + ": " + leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
-                }
-            }, 200);
-
-
-
-        }); // When Ready.
-
-    </script>
+    <script src="scripts/vortex.js"></script>
+    <script src="scripts/app.js"></script>
 
 </head>
 
-
 <body>
     <platinum-https-redirect></platinum-https-redirect>
-
     <x-app></x-app>
-
 </body>
 </html>
 
 <!-- Notes -->
 
-<!-- todo use vulcanise:  https://github.com/Polymer/vulcanize -->
 <!-- http://stackoverflow.com/questions/33598105/fill-page-with-iron-pages-element
 
 <!-- http://stackoverflow.com/questions/31964572/polymer-v1-0-iron-list-in-a-complex-flex-layout-is-not-visible  -->
