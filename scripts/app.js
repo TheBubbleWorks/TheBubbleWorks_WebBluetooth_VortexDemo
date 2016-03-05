@@ -1,6 +1,21 @@
 (function(document) {
-
     'use strict';
+
+    /**
+     * Elements are guartneed to be upgraded and ready at this point.
+     * It's safe to poke element properties, call methods, etc.
+     *
+     * Note: in Chrome (or a browser that natively supports HTML Imports)
+     * waiting for this event is not needed. Imports will have already
+     * loaded and upgraded elements by the time the bottom of the page
+     * is reached. However, waiting for this event consolidates the code
+     * paths between native and polyfill.
+     */
+    document.addEventListener('WebComponentsReady', function(e) {
+        console.log('WebComponentsReady!!!');
+        onReady();
+    });
+
 
 // ------------------------------------------------------------------------------
 // Declarations (no DOM or Polymer interaction, don oafter page lod)
@@ -49,14 +64,13 @@ function VortexAPI() {
 // ------------------------------------------------------------------------------
 // On Page load
 
-HTMLImports.whenReady(function() {
+function onReady() {
     var connected = false;
     var leftMotorSpeed=0, rightMotorSpeed=0;
     var vortex = new VortexAPI();
 
-
     Polymer({
-        is: 'x-app',
+        is: 'my-app',
 
 
         eyeSelected: function(e) {
@@ -177,7 +191,7 @@ HTMLImports.whenReady(function() {
     }
 
 
-}); // When Ready.
+}
 
 
 })(document);

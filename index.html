@@ -11,211 +11,147 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
-
     <!-- Polyfill Web Components support for older browsers -->
-    <script src="lib/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
 
+    <!-- Because this project uses vulcanize this should be your only html import
+     in this file. All other imports should go in elements.html -->
+    <link rel="import" href="elements/elements.html">
 
-    <!-- I think we may only need this if your going to define your own components -->
-    <link rel="import" href="lib/polymer/polymer.html">
+    <link rel="stylesheet" href="bower_components/retro-joystick/styles/retro-joystick.css">
 
-
-    <!-- Polymer Core/'Iron' components -->
-
-    <link rel="import" href="lib/iron-icon/iron-icon.html">
-    <link rel="import" href="lib/iron-icons/iron-icons.html">
-    <link rel="import" href="lib/iron-pages/iron-pages.html">
-    <link rel="import" href="lib/iron-list/iron-list.html">
-    <link rel="import" href="lib/iron-ajax/iron-ajax.html">
-    <link rel="import" href="lib/iron-flex-layout/iron-flex-layout.html">
-
-
-    <!-- Polymer Material Design components -->
-
-    <link rel="import" href="lib/paper-button/paper-button.html">
-    <link rel="import" href="lib/paper-toggle-button/paper-toggle-button.html">
-    <link rel="import" href="lib/paper-radio-group/paper-radio-group.html">
-    <link rel="import" href="lib/paper-tabs/paper-tab.html">
-    <link rel="import" href="lib/paper-tabs/paper-tabs.html">
-    <link rel="import" href="lib/paper-toolbar/paper-toolbar.html">
-    <link rel="import" href="lib/paper-icon-button/paper-icon-button.html">
-
-
-    <!-- Polymer Platinum components -->
-    <link rel="import" href="lib/platinum-bluetooth/platinum-bluetooth-elements.html">
-    <link rel="import" href="lib/platinum-https-redirect/platinum-https-redirect.html">
-
-
-    <!-- Custom Elements. see: https://customelements.io/   -->
-
-    <link rel="import" href="lib/paper-color-picker/paper-color-input.html">
-
-
-
-    <!-- joystick -->
-    <script src="lib/jquery/dist/jquery.min.js"></script>
-    <script src="lib/retro-joystick/scripts/retro-joystick.js"></script>
-    <link rel="stylesheet" href="lib/retro-joystick/styles/retro-joystick.css">
-
-
-    <dom-module id="x-app">
-
-        <style>
-
-            body {
-                font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
-                margin: 0;
-                padding: 24px;
-                color: #333;
-            }
-
-            paper-tabs, core-toolbar {
-                background-color: #00bcd4;
-                color: #fff;
-                box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.2);
-            }
-
-            core-toolbar paper-tabs {
-                box-shadow: none;
-            }
-
-            paper-tabs[noink][nobar] paper-tab.core-selected {
-                color: #ffff8d;
-            }
-
-            paper-tabs.transparent-teal {
-                background-color: transparent;
-                color: #00bcd4;
-                box-shadow: none;
-            }
-
-            paper-tabs.transparent-teal::shadow #selectionBar {
-                background-color: #00bcd4;
-            }
-
-            paper-tabs.transparent-teal paper-tab::shadow #ink {
-                color: #00bcd4;
-            }
-
-            h3 {
-                font-size: 16px;
-                font-weight: 400;
-            }
-
-        </style>
-
-
-        <style is="custom-style">
-
-            /*iron-list {
-                @apply(--layout-fit);
-            }*/
-            .item {
-                padding: 40px;
-                border-bottom: 1px solid #ccc;
-            }
-
-        </style>
-
-
-        <template>
-
-            <paper-toolbar class="medium-tall">
-
-                <paper-icon-button icon="menu"></paper-icon-button>
-                <div flex><paper-toggle-button class="blue" id="connectToggle">Connect</paper-toggle-button></div>
-                <div flex>Vortex</div>
-                <paper-button id="send-reset-button" raised>Send Reset</paper-button>
-
-                <!--
-                <paper-icon-button icon="search"></paper-icon-button>
-                <paper-icon-button icon="more-vert"></paper-icon-button>
-                -->
-
-                <div class="bottom fit" horizontal layout>
-
-                    <paper-tabs selected="0" flex style="max-width: 600px;">
-
-                        <paper-tab>Moving</paper-tab>
-                        <paper-tab>Emotions</paper-tab>
-                        <paper-tab>Colours</paper-tab>
-
-                    </paper-tabs>
-
-                </div>
-
-            </paper-toolbar>
-
-            <iron-pages selected="0">
-
-                <!-- Moving page -->
-                <div id="retrostick" class="retrostick">
-                    <div class="retrostick-base">
-                        <div class="retrostick-base-joint">
-                            <div><div></div></div>
-                        </div>
-                        <div class="retrostick-stick-wrap">
-                            <div class="retrostick-stick"></div>
-                        </div>
-                        <div class="retrostick-ball"></div>
-                    </div>
-
-                    <paper-radio-group selected="danceOff">
-                        <paper-radio-button name="danceOff">No Dancing</paper-radio-button>
-                        <paper-radio-button name="dance1">Dance 1</paper-radio-button>
-                        <paper-radio-button name="dance2">Dance 2</paper-radio-button>
-                        <paper-radio-button name="dance3">Dance 3</paper-radio-button>
-                        <paper-radio-button name="dance4">Dance 4</paper-radio-button>
-                    </paper-radio-group>
-                </div>
-
-                <!-- emotion page -->
-                <div>
-                        <iron-ajax url="conf/eyes.json" last-response="{{data}}" auto></iron-ajax>
-
-                        <iron-list items="[[data]]" as="item">
-                            <template>
-                                <div class="item" >
-                                    <img class="avatar" src="[[item.image]]" on-tap="eyeSelected">
-
-                                    <!--
-                                    <b>#[[index]] - [[item.image]]</b>
-                                    <p>[[item.longText]]</p>
-                                    -->
-                                </div>
-                            </template>
-                        </iron-list>
-
-                </div>
-
-                <!-- Colours page -->
-                <div>
-                    <!--<polymer-color-picker color="{{selectedColor}}"></polymer-color-picker>-->
-
-                    <paper-color-input label="Top Colour" shape="circle" type="hsl"></paper-color-input>
-                </div>
-            </iron-pages>
-
-
-
-            <platinum-bluetooth-device services-filter='["0000dfb0-0000-1000-8000-00805f9b34fb"]'>
-                <platinum-bluetooth-characteristic service='0000dfb0-0000-1000-8000-00805f9b34fb'
-                                                   characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'>
-                </platinum-bluetooth-characteristic>
-            </platinum-bluetooth-device>
-        </template>
-
-
-    </dom-module>
 
     <script src="scripts/vortex.js"></script>
     <script src="scripts/app.js"></script>
+<!--
+    <script>
+        (function() {
+            'use strict';
 
-</head>
+            function lazyLoadWCPolyfillsIfNecessary() {
+                var onload = function() {
+                    // For native Imports, manually fire WCR so user code
+                    // can use the same code path for native and polyfill'd imports.
+                    if (!window.HTMLImports) {
+                        document.dispatchEvent(
+                                new CustomEvent('WebComponentsReady', {bubbles: true}));
+                    }
+                };
+
+                var webComponentsSupported = (
+                'registerElement' in document
+                && 'import' in document.createElement('link')
+                && 'content' in document.createElement('template'));
+                if (!webComponentsSupported) {
+                    var script = document.createElement('script');
+                    script.async = true;
+                    script.src = 'webcomponentsjs/webcomponents-lite.min.js';
+                    script.onload = onload;
+                    document.head.appendChild(script);
+                } else {
+                    onload();
+                }
+            }
+
+
+            lazyLoadWCPolyfillsIfNecessary();
+        })();
+    </script>
+    -->
 
 <body>
     <platinum-https-redirect></platinum-https-redirect>
-    <x-app></x-app>
+
+    <template is="dom-bind" id="my-app">
+
+        <paper-toolbar class="medium-tall">
+
+            <paper-icon-button icon="menu"></paper-icon-button>
+            <div flex><paper-toggle-button class="blue" id="connectToggle">Connect</paper-toggle-button></div>
+            <div flex>Vortex</div>
+            <paper-button id="send-reset-button" raised>Send Reset</paper-button>
+
+            <!--
+            <paper-icon-button icon="search"></paper-icon-button>
+            <paper-icon-button icon="more-vert"></paper-icon-button>
+            -->
+
+            <div class="bottom fit" horizontal layout>
+
+                <paper-tabs selected="0" flex style="max-width: 600px;">
+
+                    <paper-tab>Moving</paper-tab>
+                    <paper-tab>Emotions</paper-tab>
+                    <paper-tab>Colours</paper-tab>
+
+                </paper-tabs>
+
+            </div>
+
+        </paper-toolbar>
+
+        <iron-pages selected="0">
+
+            <!-- Moving page -->
+            <div id="retrostick" class="retrostick">
+                <div class="retrostick-base">
+                    <div class="retrostick-base-joint">
+                        <div><div></div></div>
+                    </div>
+                    <div class="retrostick-stick-wrap">
+                        <div class="retrostick-stick"></div>
+                    </div>
+                    <div class="retrostick-ball"></div>
+                </div>
+
+                <paper-radio-group selected="danceOff">
+                    <paper-radio-button name="danceOff">No Dancing</paper-radio-button>
+                    <paper-radio-button name="dance1">Dance 1</paper-radio-button>
+                    <paper-radio-button name="dance2">Dance 2</paper-radio-button>
+                    <paper-radio-button name="dance3">Dance 3</paper-radio-button>
+                    <paper-radio-button name="dance4">Dance 4</paper-radio-button>
+                </paper-radio-group>
+            </div>
+
+            <!-- emotion page -->
+            <div>
+                    <iron-ajax url="conf/eyes.json" last-response="{{data}}" auto></iron-ajax>
+
+                    <iron-list items="[[data]]" as="item">
+                        <template>
+                            <div class="item" >
+                                <img class="avatar" src="[[item.image]]" on-tap="eyeSelected">
+
+                                <!--
+                                <b>#[[index]] - [[item.image]]</b>
+                                <p>[[item.longText]]</p>
+                                -->
+                            </div>
+                        </template>
+                    </iron-list>
+
+            </div>
+
+            <!-- Colours page -->
+            <div>
+                <!--<polymer-color-picker color="{{selectedColor}}"></polymer-color-picker>-->
+
+                <paper-color-input label="Top Colour" shape="circle" type="hsl"></paper-color-input>
+            </div>
+        </iron-pages>
+
+
+
+        <platinum-bluetooth-device services-filter='["0000dfb0-0000-1000-8000-00805f9b34fb"]'>
+            <platinum-bluetooth-characteristic service='0000dfb0-0000-1000-8000-00805f9b34fb'
+                                               characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'>
+            </platinum-bluetooth-characteristic>
+        </platinum-bluetooth-device>
+    </template>
+
+
+</head>
+
 </body>
 </html>
 
