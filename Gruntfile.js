@@ -14,6 +14,8 @@ module.exports = function(grunt) {
                 dest: 'dist/',
             },
 
+            // There should no need to copy as we vulcanise the included elements into a single elements.html file later
+            // However... TODO: find the handful of cases where the include dependancied arent being picked up (e.g. colours.json)
             bower: {
                 expand: true,
                 cwd: "app/bower_components",
@@ -30,7 +32,7 @@ module.exports = function(grunt) {
                     stripComments: true,
                 },
                 files: {
-                    'dist/index-inlined.html': 'dist/index.html'
+                    'dist/elements/elements.html': 'app/elements/elements.html'
                 },
             },
         },
@@ -74,7 +76,7 @@ module.exports = function(grunt) {
     //grunt.loadNpmTasks('grunt-contrib-connect')  etc.
 
 
-    grunt.registerTask('default', ['clean',  'copy']); //, 'vulcanize']);
+    grunt.registerTask('default', ['clean', 'copy', 'vulcanize']);
     grunt.registerTask('dev', ['watch']);
     grunt.registerTask('serve', ['connect:server']);
     grunt.registerTask('publish', ['default', 'gh-pages']);
