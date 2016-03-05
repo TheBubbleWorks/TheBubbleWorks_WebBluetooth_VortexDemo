@@ -13,66 +13,56 @@
 
 
     <!-- Polyfill Web Components support for older browsers -->
-    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="lib/webcomponentsjs/webcomponents-lite.min.js"></script>
     <!--<script src="bower_components/webcomponentsjs/webcomponents.js"></script>-->
 
 
     <!-- I think we may only need this if your going to define your own components -->
-    <link rel="import" href="bower_components/polymer/polymer.html">
+    <link rel="import" href="lib/polymer/polymer.html">
 
 
     <!-- Polymer Core/'Iron' components -->
 
-    <link rel="import" href="bower_components/iron-icon/iron-icon.html">
-    <link rel="import" href="bower_components/iron-icons/iron-icons.html">
-    <link rel="import" href="bower_components/iron-pages/iron-pages.html">
+    <link rel="import" href="lib/iron-icon/iron-icon.html">
+    <link rel="import" href="lib/iron-icons/iron-icons.html">
+    <link rel="import" href="lib/iron-pages/iron-pages.html">
 
-    <link rel="import" href="bower_components/iron-list/iron-list.html">
-    <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
-    <link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+    <link rel="import" href="lib/iron-list/iron-list.html">
+    <link rel="import" href="lib/iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="lib/iron-ajax/iron-ajax.html">
 
 
     <!-- Polymer Material Design components -->
 
-    <link rel="import" href="bower_components/paper-card/paper-card.html">
-    <link rel="import" href="bower_components/paper-input/paper-input.html">
-    <link rel="import" href="bower_components/paper-input/paper-input-container.html">
-    <link rel="import" href="bower_components/paper-input/paper-input-error.html">
-    <link rel="import" href="bower_components/paper-input/paper-input-char-counter.html">
-    <link rel="import" href="bower_components/paper-button/paper-button.html">
-    <link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
-    <link rel="import" href="bower_components/paper-progress/paper-progress.html">
-    <link rel="import" href="bower_components/paper-slider/paper-slider.html">
-    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
-    <link rel="import" href="bower_components/paper-radio-group/paper-radio-group.html">
-
-    <link rel="import" href="bower_components/paper-tabs/paper-tab.html">
-    <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
-    <link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
-
-    <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="lib/paper-button/paper-button.html">
+    <link rel="import" href="lib/paper-toggle-button/paper-toggle-button.html">
+    <link rel="import" href="lib/paper-radio-group/paper-radio-group.html">
+    <link rel="import" href="lib/paper-tabs/paper-tab.html">
+    <link rel="import" href="lib/paper-tabs/paper-tabs.html">
+    <link rel="import" href="lib/paper-toolbar/paper-toolbar.html">
+    <link rel="import" href="lib/paper-icon-button/paper-icon-button.html">
 
 
-    <!-- Polymer Platinum  -->
-    <link rel="import" href="bower_components/platinum-bluetooth/platinum-bluetooth-elements.html">
-    <link rel="import" href="bower_components/platinum-https-redirect/platinum-https-redirect.html">
+    <!-- Polymer Platinum components -->
+    <link rel="import" href="lib/platinum-bluetooth/platinum-bluetooth-elements.html">
+    <link rel="import" href="lib/platinum-https-redirect/platinum-https-redirect.html">
 
 
 
-    <!-- Vustom Elemenst. see: https://customelements.io/   -->
+    <!-- Custom Elements. see: https://customelements.io/   -->
 
-    <link rel="import" href="bower_components/polymer-color-picker/polymer-color-picker.html">
-    <link rel="import" href="bower_components/paper-color-picker/paper-color-circle.html">
-    <link rel="import" href="bower_components/paper-color-picker/paper-color-picker.html">
-    <link rel="import" href="bower_components/paper-color-picker/paper-color-input.html">
+    <link rel="import" href="lib/polymer-color-picker/polymer-color-picker.html">
+    <link rel="import" href="lib/paper-color-picker/paper-color-circle.html">
+    <link rel="import" href="lib/paper-color-picker/paper-color-picker.html">
+    <link rel="import" href="lib/paper-color-picker/paper-color-input.html">
 
 
 
 
     <!-- joystick -->
-    <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="bower_components/retro-joystick/scripts/retro-joystick.js"></script>
-    <link rel="stylesheet" href="bower_components/retro-joystick/styles/retro-joystick.css">
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="lib/retro-joystick/scripts/retro-joystick.js"></script>
+    <link rel="stylesheet" href="lib/retro-joystick/styles/retro-joystick.css">
 
 
     <dom-module id="x-app">
@@ -128,7 +118,7 @@
                 @apply(--layout-fit);
             }*/
             .item {
-                padding: 10px;
+                padding: 40px;
                 border-bottom: 1px solid #ccc;
             }
 
@@ -342,7 +332,6 @@
 
 
 
-
             let joystick = new RetroJoyStick({
                 retroStickElement: document.querySelector('#retrostick')
             });
@@ -371,8 +360,6 @@
         }); // When Ready.
 
     </script>
-
-
 
 </head>
 

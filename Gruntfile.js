@@ -1,7 +1,7 @@
-// see: https://github.com/gruntjs/grunt-contrib-connect
 module.exports = function(grunt) {
 
 	grunt.initConfig({
+
         pkg: grunt.file.readJSON('package.json'),
 
         clean: ['dist'],
@@ -18,15 +18,29 @@ module.exports = function(grunt) {
                 expand: true,
                 cwd: "bower_components",
                 src: ['**/*'],
-                dest: 'dist/bower_components',
+                dest: 'dist/lib',
             },
         },
 
         vulcanize: {
-            options: {},
-            files: {
-                'dist/build.html': 'dist/index.html'
+            default: {
+                options: {
+                    inlineScripts: true,
+                    inlineCss: true,
+                    stripComments: true,
+                },
+                files: {
+                    'dist/index-inlined.html': 'dist/index.html'
+                },
             },
+        },
+
+        watch: {
+            options: {
+                livereload: true,
+            },
+            files: ['src/**/*'],
+            tasks: ['default'],
         },
 
         connect: {
@@ -54,18 +68,15 @@ module.exports = function(grunt) {
 	});
 
 
-
-    // This:
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
-    // Replaces lots of these:
+    // The above replaces lots of manual entries:
     //grunt.loadNpmTasks('grunt-contrib-connect');
     //grunt.loadNpmTasks('grunt-...
 
 
-    // Default task(s).
-    grunt.registerTask('default', ['clean',  'copy', 'vulcanize' ]); //'connect:server']);
-
-
-    // push to github pahgeS:  grunt gh-pages
+    grunt.registerTask('default', ['clean',  'copy']); //, 'vulcanize']);
+    grunt.registerTask('dev', ['watch']);
+    grunt.registerTask('run', ['connect:server']);
+    grunt.registerTask('publish', ['gh-pages']);
 
 };
