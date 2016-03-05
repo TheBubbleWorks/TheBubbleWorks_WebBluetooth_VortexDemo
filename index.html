@@ -1,8 +1,7 @@
-
 <!doctype html>
 <html>
 <head>
-    <title>Bluetooth Vortex</title>
+    <title>Vortex</title>
     <meta name="description" content="Control a Vortex robot with a Web Bluetooth app.">
 
     <meta charset="utf-8">
@@ -20,44 +19,8 @@
 
     <link rel="stylesheet" href="bower_components/retro-joystick/styles/retro-joystick.css">
 
-
     <script src="scripts/vortex.js"></script>
     <script src="scripts/app.js"></script>
-<!--
-    <script>
-        (function() {
-            'use strict';
-
-            function lazyLoadWCPolyfillsIfNecessary() {
-                var onload = function() {
-                    // For native Imports, manually fire WCR so user code
-                    // can use the same code path for native and polyfill'd imports.
-                    if (!window.HTMLImports) {
-                        document.dispatchEvent(
-                                new CustomEvent('WebComponentsReady', {bubbles: true}));
-                    }
-                };
-
-                var webComponentsSupported = (
-                'registerElement' in document
-                && 'import' in document.createElement('link')
-                && 'content' in document.createElement('template'));
-                if (!webComponentsSupported) {
-                    var script = document.createElement('script');
-                    script.async = true;
-                    script.src = 'webcomponentsjs/webcomponents-lite.min.js';
-                    script.onload = onload;
-                    document.head.appendChild(script);
-                } else {
-                    onload();
-                }
-            }
-
-
-            lazyLoadWCPolyfillsIfNecessary();
-        })();
-    </script>
-    -->
 
 <body>
     <platinum-https-redirect></platinum-https-redirect>
@@ -141,7 +104,6 @@
         </iron-pages>
 
 
-
         <platinum-bluetooth-device services-filter='["0000dfb0-0000-1000-8000-00805f9b34fb"]'>
             <platinum-bluetooth-characteristic service='0000dfb0-0000-1000-8000-00805f9b34fb'
                                                characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'>
@@ -154,9 +116,3 @@
 
 </body>
 </html>
-
-<!-- Notes -->
-
-<!-- http://stackoverflow.com/questions/33598105/fill-page-with-iron-pages-element
-
-<!-- http://stackoverflow.com/questions/31964572/polymer-v1-0-iron-list-in-a-complex-flex-layout-is-not-visible  -->

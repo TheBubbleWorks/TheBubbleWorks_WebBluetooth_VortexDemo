@@ -1,18 +1,7 @@
 (function(document) {
     'use strict';
 
-    /**
-     * Elements are guartneed to be upgraded and ready at this point.
-     * It's safe to poke element properties, call methods, etc.
-     *
-     * Note: in Chrome (or a browser that natively supports HTML Imports)
-     * waiting for this event is not needed. Imports will have already
-     * loaded and upgraded elements by the time the bottom of the page
-     * is reached. However, waiting for this event consolidates the code
-     * paths between native and polyfill.
-     */
     document.addEventListener('WebComponentsReady', function(e) {
-        console.log('WebComponentsReady!!!');
         onReady();
     });
 
