@@ -130,16 +130,14 @@ function onReady() {
         console.log("Connecting");
 
         bluetoothDevice.request().then(function() {
-            console.log("Connected");
-            connected = true;
-            vortex.init();
+            bluetooth_connected();
         }).catch(onError);
     });
 
 
     resetButton.addEventListener('click', function() {
         bluetoothDevice.request().then(function(device) {
-                bluetooth_connected();
+            vortex.reset;
             })
             .catch(onError);
     });
@@ -170,18 +168,20 @@ function onReady() {
 
 
     function bluetooth_connected() {
+        connected=true;
         vortex.init();
+
         setInterval( function() {
+            console.log(new Date().getTime() + ": " + leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+
             if (connected) {
-                vortex.motorSpeeds(leftMotorSpeed, rightMotorSpeed);  // 0x00 is a dummy for vortex.js
-                //console.log(new Date().getTime() + ": " + leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+                vortex.motorSpeeds(leftMotorSpeed, rightMotorSpeed);
             }
         }, 200);
     }
 
 
 }
-
 
 })(document);
 
