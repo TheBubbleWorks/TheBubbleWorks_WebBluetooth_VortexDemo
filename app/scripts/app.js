@@ -6,49 +6,6 @@
     });
 
 
-// ------------------------------------------------------------------------------
-// Declarations (no DOM or Polymer interaction, don oafter page lod)
-
-function VortexAPI() {
-    var self = this;
-
-    self.init = function() {
-        initVortex();
-    }
-
-    self.reset = function() {
-        resetAll();
-    };
-
-    // Shared: the 0's are dummy values ignored by the provided (from DFRobots Snap) vortex.js
-
-
-    // leftSpeed :   int,    -127 to 127
-    // rightSpeed:   int,    -127 to 127
-    self.motorSpeeds = function (leftSpeed, rightSpeed) {
-        move([0, leftSpeed, rightSpeed]);
-    };
-
-    // expression:  int,     1..33
-    // colour:      string, [red | blue | green | pink | yellow | cyan | white | off]
-    self.setFace = function(expression, colour) {
-        face([0, expression+1, colour]);
-    };
-
-    self.faceOff = function(expresion, colour) {
-        face_off();
-    };
-
-    // pattern:     int,    0 - 4
-    self.setDance = function(pattern) {
-        dance([0, pattern])
-    };
-
-    self.danceOff = function() {
-        stopDance();
-    };
-};
-
 
 // ------------------------------------------------------------------------------
 // On Page load
@@ -58,16 +15,27 @@ function onReady() {
     var leftMotorSpeed=0, rightMotorSpeed=0;
     var vortex = new VortexAPI();
 
+
+    function colorChanged() {
+        console.log("colourChange");
+    }
+
     Polymer({
         is: 'my-app',
 
-
-        eyeSelected: function(e) {
+        eyeSelected: function (e) {
             console.log(e.model.item);
             vortex.setFace(e.model.item.index, "red");
         },
 
+        properties: {
+            owner: {
 
+                ownerChanged: function () {
+                    console.log("ownerChanged");
+                }
+            }
+        }
     });
 
     // ------------------------------------------------------------------------------
@@ -122,7 +90,7 @@ function onReady() {
     }
     document.writeArrayToDefaultBLECharacteristic = _send_array;
 
-    var connectButton = document.getElementById("connectToggle");
+    var connectButton = document.getElementById("connect-toggle");
     var resetButton = document.getElementById("send-reset-button");
 
 
@@ -137,7 +105,7 @@ function onReady() {
 
     resetButton.addEventListener('click', function() {
         bluetoothDevice.request().then(function(device) {
-            vortex.reset;
+            vortex.reset();
             })
             .catch(onError);
     });

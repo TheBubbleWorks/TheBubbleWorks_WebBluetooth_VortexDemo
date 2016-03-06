@@ -10,7 +10,7 @@ module.exports = function(grunt) {
             all: {
                 expand: true,
                 cwd: "app/",
-                src: ['*.css', 'images/**/*', 'img/**/*', '!Gruntfile.js', 'conf/**/*', 'scripts/**/*', 'elements/**/*', 'styles/**/*', '*.html'],
+                src: ['*.css', 'images/**/*', 'img/**/*', '!Gruntfile.js', 'conf/**/*', 'scripts/**/*', 'elements/**/*', 'styles/**/*', '*.html', '**/*.ico'],
                 dest: 'dist/',
             },
 

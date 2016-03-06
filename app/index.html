@@ -30,9 +30,9 @@
         <paper-toolbar class="medium-tall">
 
             <paper-icon-button icon="menu"></paper-icon-button>
-            <div flex><paper-toggle-button class="blue" id="connectToggle">Connect</paper-toggle-button></div>
-            <div flex>Vortex</div>
-            <paper-button id="send-reset-button" raised>Send Reset</paper-button>
+            <div><paper-toggle-button class="blue" id="connect-toggle">Connect</paper-toggle-button></div>
+            <div>Vortex</div>
+            <div><paper-button id="send-reset-button" raised>Send Reset</paper-button></div>
 
             <!--
             <paper-icon-button icon="search"></paper-icon-button>
@@ -46,6 +46,7 @@
                     <paper-tab>Moving</paper-tab>
                     <paper-tab>Emotions</paper-tab>
                     <paper-tab>Colours</paper-tab>
+                    <paper-tab>Music</paper-tab>
 
                 </paper-tabs>
 
@@ -99,7 +100,11 @@
             <div>
                 <!--<polymer-color-picker color="{{selectedColor}}"></polymer-color-picker>-->
 
-                <paper-color-input label="Top Colour" shape="circle" type="hsl"></paper-color-input>
+                <paper-color-input label="Top Colour" shape="circle" type="hsl" value="{{owner}}"></paper-color-input>
+                <!--<input is="iron-input" bind-value="{{owner}}" placeholder="Your name here...">-->
+                <p>
+                    This is a <strong>{{owner}}</strong>'s editable-name-tag.
+                </p>
             </div>
         </iron-pages>
 
