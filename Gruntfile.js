@@ -7,7 +7,7 @@ module.exports = function(grunt) {
         clean: ['dist'],
 
         copy: {
-            all: {
+            app: {
                 expand: true,
                 cwd: "app/",
                 src: ['*.css', 'images/**/*', 'img/**/*', '!Gruntfile.js', 'conf/**/*', 'scripts/**/*', 'elements/**/*', 'styles/**/*', '*.html', 'favicon.ico'],
@@ -15,8 +15,8 @@ module.exports = function(grunt) {
             },
 
 
-            // manually copy some parts (need to add to vulcanise options)
-            bower_subset: {
+            // manually copy some parts (need look at the Vulcanise options to pick these up)
+            dep_subset: {
                 expand: true,
                 cwd: "app/bower_components",
                 src: ['webcomponentsjs/**/*', 'font-roboto/**/*', 'paper-color-picker/**/*'],
@@ -24,13 +24,12 @@ module.exports = function(grunt) {
             },
 
             // There should no need to copy as we vulcanise the included elements into a single elements.html file later
-            // However... TODO: find the handful of cases where the include dependancied arent being picked up (e.g. colours.json)
-            bower: {
-                expand: true,
-                cwd: "app/bower_components",
-                src: ['**/*'],
-                dest: 'dist/bower_components',
-            },
+            //bower: {
+            //    expand: true,
+            //    cwd: "app/bower_components",
+            //    src: ['**/*'],
+            //    dest: 'dist/bower_components',
+            //},
         },
 
         vulcanize: {
@@ -86,9 +85,9 @@ module.exports = function(grunt) {
 
 
     //grunt.registerTask('default', ['clean', 'copy:all']);
-    grunt.registerTask('default', ['clean', 'copy:all', 'copy:bower_subset', 'vulcanize']);
+    grunt.registerTask('default', ['clean', 'copy:app', 'copy:dep_subset', 'vulcanize']);
     grunt.registerTask('dev', ['default', 'watch']);
     grunt.registerTask('serve', ['default', 'connect:server']);
-    grunt.registerTask('publish', ['release', 'gh-pages']);
+    grunt.registerTask('publish', ['default', 'gh-pages']);
 
 };
