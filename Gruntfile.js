@@ -10,8 +10,17 @@ module.exports = function(grunt) {
             all: {
                 expand: true,
                 cwd: "app/",
-                src: ['*.css', 'images/**/*', 'img/**/*', '!Gruntfile.js', 'conf/**/*', 'scripts/**/*', 'elements/**/*', 'styles/**/*', '*.html', '**/*.ico'],
+                src: ['*.css', 'images/**/*', 'img/**/*', '!Gruntfile.js', 'conf/**/*', 'scripts/**/*', 'elements/**/*', 'styles/**/*', '*.html', 'favicon.ico'],
                 dest: 'dist/',
+            },
+
+
+            // manually copy some parts (need to add to vulcanise options)
+            bower_subset: {
+                expand: true,
+                cwd: "app/bower_components",
+                src: ['webcomponentsjs/**/*', 'font-roboto/**/*', 'paper-color-picker/**/*'],
+                dest: 'dist/bower_components',
             },
 
             // There should no need to copy as we vulcanise the included elements into a single elements.html file later
@@ -76,8 +85,8 @@ module.exports = function(grunt) {
     //grunt.loadNpmTasks('grunt-contrib-connect')  etc.
 
 
-    grunt.registerTask('default', ['clean', 'copy', 'copy:bower']);
-    grunt.registerTask('release', ['clean', 'copy', 'vulcanize']);
+    //grunt.registerTask('default', ['clean', 'copy:all']);
+    grunt.registerTask('default', ['clean', 'copy:all', 'copy:bower_subset', 'vulcanize']);
     grunt.registerTask('dev', ['default', 'watch']);
     grunt.registerTask('serve', ['default', 'connect:server']);
     grunt.registerTask('publish', ['release', 'gh-pages']);
