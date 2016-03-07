@@ -22,21 +22,20 @@ function onReady() {
 
     Polymer({
         is: 'my-app',
-
-        eyeSelected: function (e) {
-            console.log(e.model.item);
-            vortex.setFace(e.model.item.index, "red");
-        },
-
-        properties: {
-            owner: {
-
-                ownerChanged: function () {
-                    console.log("ownerChanged");
-                }
-            }
-        }
     });
+
+    var app = document.querySelector('#my-app');
+
+    app.eyeSelected = function(e) {
+        console.log(e.model.item);
+        vortex.setFace(e.model.item.index, "red");
+    }
+
+
+    app.handleInput = function (e) {
+        console.log("col change");
+    }
+
 
     // ------------------------------------------------------------------------------
     // UI Events
@@ -64,11 +63,13 @@ function onReady() {
 
     var el = document.querySelector('paper-color-input');
 
-    el.addEventListener('value', function(){
+    el.addEventListener('value-changed', function(){
         var normalizedEvent = Polymer.dom(event);
-        console.info('rootTarget is:', normalizedEvent.rootTarget);
-        console.info('localTarget is:', normalizedEvent.localTarget);
-        console.info('path is:', normalizedEvent.path);
+        //console.info('rootTarget is:', normalizedEvent.rootTarget);
+        //console.info('localTarget is:', normalizedEvent.localTarget);
+        //console.info('path is:', normalizedEvent.path);
+        console.log("Colour: " + event.detail.value);
+        console.log(el.value.red, el.value.green, el.value.blue);
     });
 
 
@@ -82,13 +83,13 @@ function onReady() {
 
     function _send_array(byteArray) {
         var bytes = new Uint8Array(byteArray);
-        if (connected) {
-            writeCharacteristic.write(bytes).then(function() {});
-        } else {
-            console.log("WARN: attempt to send while not connected: " + bytes);
+            if (connected) {
+                writeCharacteristic.write(bytes).then(function() {});
+            } else {
+                console.log("WARN: attempt to send while not connected: " + bytes);
+            }
         }
-    }
-    document.writeArrayToDefaultBLECharacteristic = _send_array;
+        document.writeArrayToDefaultBLECharacteristic = _send_array;
 
     var connectButton = document.getElementById("connect-toggle");
     var resetButton = document.getElementById("send-reset-button");
@@ -119,11 +120,12 @@ function onReady() {
     // Joystick
 
 
-    let joystick = new RetroJoyStick({
+    var joystick = new RetroJoyStick({
         retroStickElement: document.querySelector('#retrostick')
     });
 
-    joystick.subscribe('change', stick => {
+
+    joystick.subscribe('change', function(stick)  {
 
         var y = (Math.cos(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
     var x = (Math.sin(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
@@ -132,7 +134,7 @@ function onReady() {
 
     //console.log( new Date().getTime() + ": " +stick.angle, stick.distance + " => " + x, y, ": " +leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
 
-});
+}.bind(this));
 
 
     function bluetooth_connected() {

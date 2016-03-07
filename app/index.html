@@ -85,7 +85,7 @@
                         <template>
                             <div class="item" >
                                 <img class="avatar" src="[[item.image]]" on-tap="eyeSelected">
-
+                                <!--<iron-icon src="[[item.image]]" on-tap="eyeSelected"></iron-icon>-->
                                 <!--
                                 <b>#[[index]] - [[item.image]]</b>
                                 <p>[[item.longText]]</p>
@@ -100,7 +100,7 @@
             <div>
                 <!--<polymer-color-picker color="{{selectedColor}}"></polymer-color-picker>-->
 
-                <paper-color-input label="Top Colour" shape="circle" type="hsl" value="{{owner}}"></paper-color-input>
+                <paper-color-input label="Top Colour" shape="circle" type="hsl" on-input="handleInput" ></paper-color-input>
                 <!--<input is="iron-input" bind-value="{{owner}}" placeholder="Your name here...">-->
                 <p>
                     This is a <strong>{{owner}}</strong>'s editable-name-tag.

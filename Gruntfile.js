@@ -76,9 +76,10 @@ module.exports = function(grunt) {
     //grunt.loadNpmTasks('grunt-contrib-connect')  etc.
 
 
-    grunt.registerTask('default', ['clean', 'copy', 'vulcanize']);
+    grunt.registerTask('default', ['clean', 'copy', 'copy:bower']);
+    grunt.registerTask('release', ['clean', 'copy', 'vulcanize']);
     grunt.registerTask('dev', ['default', 'watch']);
     grunt.registerTask('serve', ['default', 'connect:server']);
-    grunt.registerTask('publish', ['default', 'gh-pages']);
+    grunt.registerTask('publish', ['release', 'gh-pages']);
 
 };
