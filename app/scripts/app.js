@@ -42,14 +42,15 @@ function onReady() {
 
     var pages = document.querySelector('iron-pages');
     var tabs = document.querySelector('paper-tabs');
-    var danceMoves = document.querySelector('paper-radio-group');
+    var danceGroup = document.querySelector('#danceGroup');
+    var musicGRoup = document.querySelector('#faceGroup');
 
     tabs.addEventListener('iron-select', function() {
         pages.selected = tabs.selected;
     });
 
-    danceMoves.addEventListener('iron-select', function() {
-        var dance = danceMoves.selected;
+    danceGroup.addEventListener('iron-select', function() {
+        var dance = danceGroup.selected;
         console.log("dance selected:" + dance);
         switch (dance) {
             case "danceOff": vortex.danceOff(); break;
@@ -61,9 +62,22 @@ function onReady() {
         }
     });
 
-    var el = document.querySelector('paper-color-input');
+    musicGroup.addEventListener('iron-select', function() {
+        var music = musicGroup.selected;
+        console.log("music selected:" + dance);
+        switch (dance) {
+            case "musicOff": vortex.musicOff(); break;
+            case "music1": vortex.setMusic(0); break;
+            case "music2": vortex.setMusic(1); break;
+            case "music3": vortex.setMusic(2); break;
+            case "music4": vortex.setMusic(3); break;
+            default:    vortex.musicOff();
+        }
+    });
 
-    el.addEventListener('value-changed', function(){
+    var vortexColourPicker = document.querySelector('paper-color-input');
+
+    vortexColourPicker.addEventListener('value-changed', function(){
         var normalizedEvent = Polymer.dom(event);
         //console.info('rootTarget is:', normalizedEvent.rootTarget);
         //console.info('localTarget is:', normalizedEvent.localTarget);
@@ -75,7 +89,7 @@ function onReady() {
 
 
     // ------------------------------------------------------------------------------
-    // Bluetooth LE (largley bolierplate)
+    // Bluetooth LE (mostly bolierplate)
 
 
     var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
@@ -128,13 +142,13 @@ function onReady() {
     joystick.subscribe('change', function(stick)  {
 
         var y = (Math.cos(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
-    var x = (Math.sin(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
-    leftMotorSpeed = (y + x) * 127;
-    rightMotorSpeed = (y - x) * 127;
+        var x = (Math.sin(stick.angle * (Math.PI / 180))  * stick.distance) / 100;
+        leftMotorSpeed = (y + x) * 127;
+        rightMotorSpeed = (y - x) * 127;
 
-    //console.log( new Date().getTime() + ": " +stick.angle, stick.distance + " => " + x, y, ": " +leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+        //console.log( new Date().getTime() + ": " +stick.angle, stick.distance + " => " + x, y, ": " +leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
 
-}.bind(this));
+    }.bind(this));
 
 
     function bluetooth_connected() {
