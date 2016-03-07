@@ -17,7 +17,7 @@
      in this file. All other imports should go in elements.html -->
     <link rel="import" href="elements/elements.html">
 
-    <link rel="stylesheet" href="bower_components/retro-joystick/styles/retro-joystick.css">
+    <link rel="stylesheet" href="styles/retro-joystick.css">
 
     <script src="scripts/vortex.js"></script>
     <script src="scripts/app.js"></script>
@@ -30,9 +30,9 @@
         <paper-toolbar class="medium-tall">
 
             <paper-icon-button icon="menu"></paper-icon-button>
-            <div flex><paper-toggle-button class="blue" id="connectToggle">Connect</paper-toggle-button></div>
-            <div flex>Vortex</div>
-            <paper-button id="send-reset-button" raised>Send Reset</paper-button>
+            <div><paper-toggle-button class="blue" id="connect-toggle">Connect</paper-toggle-button></div>
+            <div>Vortex</div>
+            <div><paper-button id="send-reset-button" raised>Send Reset</paper-button></div>
 
             <!--
             <paper-icon-button icon="search"></paper-icon-button>
@@ -42,11 +42,11 @@
             <div class="bottom fit" horizontal layout>
 
                 <paper-tabs selected="0" flex style="max-width: 600px;">
-
                     <paper-tab>Moving</paper-tab>
+                    <paper-tab>Dancing</paper-tab>
                     <paper-tab>Emotions</paper-tab>
                     <paper-tab>Colours</paper-tab>
-
+                    <paper-tab>Music</paper-tab>
                 </paper-tabs>
 
             </div>
@@ -56,17 +56,22 @@
         <iron-pages selected="0">
 
             <!-- Moving page -->
-            <div id="retrostick" class="retrostick">
-                <div class="retrostick-base">
-                    <div class="retrostick-base-joint">
-                        <div><div></div></div>
+            <div>
+                <div id="retrostick" class="retrostick">
+                    <div class="retrostick-base">
+                        <div class="retrostick-base-joint">
+                            <div><div></div></div>
+                        </div>
+                        <div class="retrostick-stick-wrap">
+                            <div class="retrostick-stick"></div>
+                        </div>
+                        <div class="retrostick-ball"></div>
                     </div>
-                    <div class="retrostick-stick-wrap">
-                        <div class="retrostick-stick"></div>
-                    </div>
-                    <div class="retrostick-ball"></div>
                 </div>
+            </div>
 
+            <!-- Dancing page -->
+            <div>
                 <paper-radio-group selected="danceOff">
                     <paper-radio-button name="danceOff">No Dancing</paper-radio-button>
                     <paper-radio-button name="dance1">Dance 1</paper-radio-button>
@@ -84,7 +89,7 @@
                         <template>
                             <div class="item" >
                                 <img class="avatar" src="[[item.image]]" on-tap="eyeSelected">
-
+                                <!--<iron-icon src="[[item.image]]" on-tap="eyeSelected"></iron-icon>-->
                                 <!--
                                 <b>#[[index]] - [[item.image]]</b>
                                 <p>[[item.longText]]</p>
@@ -99,7 +104,11 @@
             <div>
                 <!--<polymer-color-picker color="{{selectedColor}}"></polymer-color-picker>-->
 
-                <paper-color-input label="Top Colour" shape="circle" type="hsl"></paper-color-input>
+                <paper-color-input label="Top Colour" shape="circle" type="hsl" on-input="handleInput" ></paper-color-input>
+                <!--<input is="iron-input" bind-value="{{owner}}" placeholder="Your name here...">-->
+                <p>
+                    This is a <strong>{{owner}}</strong>'s editable-name-tag.
+                </p>
             </div>
         </iron-pages>
 

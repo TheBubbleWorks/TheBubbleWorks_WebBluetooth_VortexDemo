@@ -615,3 +615,48 @@ function reportStatus(callback){
 
 	callback("version " + version + "\n");
 }
+
+
+
+function VortexAPI() {
+	var self = this;
+
+	self.init = function() {
+		initVortex();
+	}
+
+	self.reset = function() {
+		resetAll();
+	};
+
+	// Shared: the 0's are dummy values ignored by the provided (from DFRobots Snap) vortex.js
+
+
+	// leftSpeed :   int,    -127 to 127
+	// rightSpeed:   int,    -127 to 127
+	self.motorSpeeds = function (leftSpeed, rightSpeed) {
+		move([0, leftSpeed, rightSpeed]);
+	};
+
+	// expression:  int,     1..33
+	// colour:      string, [red | blue | green | pink | yellow | cyan | white | off]
+	self.setFace = function(expression, colour) {
+		face([0, expression+1, colour]);
+	};
+
+	self.faceOff = function(expresion, colour) {
+		face_off();
+	};
+
+	// pattern:     int,    0 - 4
+	self.setDance = function(pattern) {
+		dance([0, pattern])
+	};
+
+	self.danceOff = function() {
+		stopDance();
+	};
+};
+
+
+
