@@ -584,24 +584,14 @@ function sendData(data, slient){
 	if(!slient){
 		dir(data);
 	}
-
-
-	// TODO
-	// The "\n" is added to workaround the bug with multiple commands
-	// especially with "STOP MUSIC" after other commands.
-	//io.write(new Buffer(data.concat("\n")));
-	// io.write(new Buffer(data));
-
-    //sendMessage(create_message_from_int8array(data));
-	// TODO: what's a better way to inject this...
-	document.writeArrayToDefaultBLECharacteristic(data);
-
+	// TODO:  a better way to inject this... (e.g. refactor the verbatim code above into VortexAPI below)
+	document.vortex.sendData(data);
 }
 
 
 
 /**
- * Send three status variables to the callback function
+ * Send three status varibles to the callback function
  */
 
 function reportStatus(callback){
@@ -618,25 +608,113 @@ function reportStatus(callback){
 
 
 
-function VortexAPI() {
+// ------------------------------------------------------------------------------
+// Custom wrapper
+function VortexAPI(deviceElement, writeElement, readElement) {
+
+
 	var self = this;
 
-	self.init = function() {
-		initVortex();
+	self.deviceElement = deviceElement;
+	self.writeElement  = writeElement;
+	self.readElement   = readElement;
+
+	self.device    = undefined;
+	self.connected = false;
+
+	self.okToSend  = true;   // sometimes helped workaround https://bugs.chromium.org/p/chromium/issues/detail?id=531536
+
+	// ------------------------------------------------------------------------------
+	// Bluetooth mehtods
+
+	self.onConnect = function(device) {
+		console.log("Connected");
+
+		if (!self.writeElement) {
+			throw "Write characteristic not set";
+		}
+
+		self.device = device;
+		self.connected = true;
+		self.okToSend = true;
+
+		//initVortex();
+		var cmd = commandCode["INIT"];
+		self.sendData([cmd]);
 	}
 
+	self.disconnect = function () {
+		console.log("WARNING: Disconnected is not implemented yet...");
+		//TODO: GATT service and device disconnection
+		//self.device.gatt.disconnect().then(function() ...
+		//self.device.disconnect().then(function() ...
+		//self.connected=false;
+	}
+
+	self.isConnected = function() {
+		return self.connected;
+	};
+
+
+	self.sendData = function (byteArray) {
+		console.log(byteArray);
+		var bytes = new Uint8Array(byteArray);
+		if (self.connected) {
+			self.okToSend = false;
+			self.writeElement.write(bytes).then(function() {
+				self.okToSend = true;
+			});
+		} else {
+			console.log("WARN: Write attempted on undefined characteristic, device not connected?");
+		}
+	}
+
+
+	// ------------------------------------------------------------------------------
+	// Vortex Commands
+
 	self.reset = function() {
+		self.okToSend = true;
 		resetAll();
 	};
 
-	// Shared: the 0's are dummy values ignored by the provided (from DFRobots Snap) vortex.js
 
+	// Below the 0's are dummy values ignored by the provided (from DFRobots Snap) vortex.js
+
+	// ------------------------------------------------------------------------------
+	// movement
 
 	// leftSpeed :   int,    -127 to 127
 	// rightSpeed:   int,    -127 to 127
-	self.motorSpeeds = function (leftSpeed, rightSpeed) {
-		move([0, leftSpeed, rightSpeed]);
+	/**
+	 * Move the wheels
+	 * @param {number} left  wheel speed, -127 ~ +127
+	 * @param {number} right wheel speed, -127 ~ +127
+	 * @param {number} duration time in seconds
+	 */
+	self.setMotorSpeeds = function (left, right, duration) {
+		var cmd = commandCode["MOVE"];
+
+		// bound the number from -127 ~ 127
+		left	= bound(left,  -127, 127);
+		right	= bound(right, -127, 127);
+
+		var leftDirection = left >= 0 ? 1 << 7 : 0;
+		var rightDirection = right >= 0 ? 1 << 7: 0;
+
+		var leftSpeed = Math.abs(left);
+		var rightSpeed = Math.abs(right);
+
+		duration = duration || 0;
+		duration = Math.floor(duration * 1000 / 20); // convert to second to units of 20 milliseconds
+		duration = bound(duration, 0, 255);
+
+		self.sendData([cmd, leftDirection | leftSpeed , rightDirection | rightSpeed, duration]);
 	};
+
+
+	// ------------------------------------------------------------------------------
+	// Face
 
 	// expression:  int,     1..33
 	// colour:      string, [red | blue | green | pink | yellow | cyan | white | off]
@@ -648,13 +726,55 @@ function VortexAPI() {
 		face_off();
 	};
 
+
+	// ------------------------------------------------------------------------------
+	// Dancing
+
 	// pattern:     int,    0 - 4
-	self.setDance = function(pattern) {
+	self.startDance = function(pattern) {
 		dance([0, pattern])
 	};
 
-	self.danceOff = function() {
+	self.stopDance = function() {
 		stopDance();
+	};
+
+
+	// ------------------------------------------------------------------------------
+	// Music
+
+	// tune:     int,    0 - 255
+	self.startMusic = function(pattern) {
+		musicplay([0, pattern]);
+	};
+
+	self.stopMusic = function() {
+		musicstop();
+	};
+
+
+
+	// command code map sent to Vortex
+	self.commandCode = {
+		"MOVE"		: 0x20,
+		"PIDLINE"	: 0x21,
+		"PLL"		: 0x22,
+		"TOP_LED"	: 0x03,
+		"BOTTOM_LED": 0x01,
+		"FACE"		: 0x02,
+		"MUSICPLAY"	: 0x10,
+		"MUSICSTOP"	: 0x11,
+		"VOLUME"	: 0x12,
+		"GREYSCALE"	: 0x33,
+		"GREYTHRES"	: 0x32,
+		"PROXCHECK"	: 0x42,
+		"INIT"		: 0x60,
+		"VERSION"	: 0x70,
+		"DANCE"		: 0x40,
+	};
+
+	self.bound = function (_number, _min, _max){
+			return Math.max(Math.min(_number, _max), _min);
 	};
 };
 
