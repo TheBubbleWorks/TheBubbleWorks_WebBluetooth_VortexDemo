@@ -63,7 +63,7 @@ module.exports = function(grunt) {
             options: {
                 livereload: true,
             },
-            files: ['app/**/*'],
+            files: ['app/**/*', '!app/bower_components/**/*.*'],
             tasks: ['default'],
         },
 
