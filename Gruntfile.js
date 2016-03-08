@@ -15,13 +15,13 @@ module.exports = function(grunt) {
             },
 
 
-            // manually copy some parts (need look at the Vulcanise options to pick these up)
+            // manually copy some resources (need look at the Vulcanise options to include these automatically)
             dep_subset: {
                 expand: true,
                 cwd: "app/bower_components",
                 src: ['webcomponentsjs/**/*', 'font-roboto/**/*', 'paper-color-picker/**/*'],
                 dest: 'dist/bower_components',
-            },
+            }
 
             // There should no need to copy as we vulcanise the included elements into a single elements.html file later
             //bower: {
@@ -45,6 +45,20 @@ module.exports = function(grunt) {
             },
         },
 
+        // see: https://babeljs.io
+        // Note: tjis lets the app use features like 'arrow syntax' but doesn't alter any libraries.
+        babel: {
+            options: {
+                sourceMap: true,
+                presets: ['es2015']
+            },
+            dist: {
+                files: {
+                    'dist/scripts/app.js': 'app/scripts/app.js'
+                }
+            }
+        },
+
         watch: {
             options: {
                 livereload: true,
@@ -63,7 +77,7 @@ module.exports = function(grunt) {
                     //key: grunt.file.read('server.key').toString(),
                     //cert: grunt.file.read('server.crt').toString(),
                     //ca: grunt.file.read('ca.crt').toString(),
-                    keepalive: true,
+                    //keepalive: true,      // don't enable because of subseqeunt 'watch' task
                     base: 'dist'
                 },
             },
@@ -86,8 +100,7 @@ module.exports = function(grunt) {
 
     //grunt.registerTask('default', ['clean', 'copy:all']);
     grunt.registerTask('default', ['clean', 'copy:app', 'copy:dep_subset', 'vulcanize']);
-    grunt.registerTask('dev', ['default', 'watch']);
-    grunt.registerTask('serve', ['default', 'connect:server']);
+    grunt.registerTask('serve', ['default',  'connect:server', 'watch',]);
     grunt.registerTask('publish', ['default', 'gh-pages']);
 
 };

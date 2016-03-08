@@ -649,12 +649,21 @@ function VortexAPI() {
 	};
 
 	// pattern:     int,    0 - 4
-	self.setDance = function(pattern) {
+	self.startDance = function(pattern) {
 		dance([0, pattern])
 	};
 
-	self.danceOff = function() {
+	self.stopDance = function() {
 		stopDance();
+	};
+
+	// tune:     int,    0 - 255
+	self.startMusic = function(pattern) {
+		musicplay([0, pattern]);
+	};
+
+	self.stopMusic = function() {
+		musicstop();
 	};
 };
 

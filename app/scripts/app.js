@@ -1,5 +1,6 @@
+'use strict';
+
 (function(document) {
-    'use strict';
 
     document.addEventListener('WebComponentsReady', function(e) {
         onReady();
@@ -16,17 +17,13 @@ function onReady() {
     var vortex = new VortexAPI();
 
 
-    function colorChanged() {
-        console.log("colourChange");
-    }
-
     Polymer({
         is: 'my-app',
     });
 
     var app = document.querySelector('#my-app');
 
-    app.eyeSelected = function(e) {
+    app.faceSelected = function(e) {
         console.log(e.model.item);
         vortex.setFace(e.model.item.index, "red");
     }
@@ -53,12 +50,12 @@ function onReady() {
         var dance = danceGroup.selected;
         console.log("dance selected:" + dance);
         switch (dance) {
-            case "danceOff": vortex.danceOff(); break;
-            case "dance1": vortex.setDance(0); break;
-            case "dance2": vortex.setDance(1); break;
-            case "dance3": vortex.setDance(2); break;
-            case "dance4": vortex.setDance(3); break;
-            default:    vortex.danceOff();
+            case "danceOff": vortex.stopDance(); break;
+            case "dance1": vortex.startDance(0); break;
+            case "dance2": vortex.startDance(1); break;
+            case "dance3": vortex.startDance(2); break;
+            case "dance4": vortex.startDance(3); break;
+            default:    vortex.stopDance();
         }
     });
 
@@ -66,12 +63,12 @@ function onReady() {
         var music = musicGroup.selected;
         console.log("music selected:" + dance);
         switch (dance) {
-            case "musicOff": vortex.musicOff(); break;
-            case "music1": vortex.setMusic(0); break;
-            case "music2": vortex.setMusic(1); break;
-            case "music3": vortex.setMusic(2); break;
-            case "music4": vortex.setMusic(3); break;
-            default:    vortex.musicOff();
+            case "musicOff": vortex.stopMusic(); break;
+            case "music1": vortex.startMusic(0); break;
+            case "music2": vortex.startMusic(1); break;
+            case "music3": vortex.startMusic(2); break;
+            case "music4": vortex.startMusic(3); break;
+            default:    vortex.stopMusic();
         }
     });
 
