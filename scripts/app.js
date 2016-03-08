@@ -22,7 +22,7 @@
 
         app.faceSelected = function(e) {
             console.log(e.model.item);
-            vortex.setFace(e.model.item.index, "red");
+            vortex.setFace(e.model.item.index+1, "red");
         }
 
 
@@ -65,7 +65,7 @@
         var musicGroup = document.querySelector('#musicGroup');
         musicGroup.addEventListener('iron-select', function() {
             var music = musicGroup.selected;
-            console.log("music selected:" + dance);
+            console.log("music selected:" + music);
             switch (music) {
                 case "musicOff": vortex.stopMusic(); break;
                 case "music1": vortex.startMusic(0); break;
@@ -97,11 +97,10 @@
         // Bluetooth LE (mostly bolierplate)
 
         var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
+        var bluetoothWriteCharacteristic = document.querySelector('platinum-bluetooth-characteristic');
+        var bluetoothReadCharacteristic = document.querySelector('platinum-bluetooth-characteristic');
 
-        var vortex = new VortexAPI(
-            bluetoothDevice,
-            document.querySelector('platinum-bluetooth-characteristic'),
-            document.querySelector('platinum-bluetooth-characteristic'));
+        var vortex = new Vortex(bluetoothDevice, bluetoothWriteCharacteristic, bluetoothReadCharacteristic);
 
         document.vortex = vortex; // current workaround to give legacy Vortex JS access.
 
