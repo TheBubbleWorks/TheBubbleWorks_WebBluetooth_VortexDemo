@@ -18,6 +18,9 @@ function Vortex(deviceElement, writeElement, readElement) {
 
 	self.okToSend  = true;   // helps workaround https://bugs.chromium.org/p/chromium/issues/detail?id=531536
 
+	self.currentFace       = 1;
+	self.currentFaceColour = 'red';
+
 
 	// ------------------------------------------------------------------------------
 	// Class defs and methods
@@ -25,19 +28,13 @@ function Vortex(deviceElement, writeElement, readElement) {
 	// Command code map sent to Vortex
 	Vortex.commandCode = {
 		"MOVE"		: 0x20,
-		"PIDLINE"	: 0x21,
-		"PLL"		: 0x22,
 		"TOP_LED"	: 0x03,
 		"BOTTOM_LED": 0x01,
 		"FACE"		: 0x02,
 		"MUSICPLAY"	: 0x10,
 		"MUSICSTOP"	: 0x11,
 		"VOLUME"	: 0x12,
-		"GREYSCALE"	: 0x33,
-		"GREYTHRES"	: 0x32,
-		"PROXCHECK"	: 0x42,
 		"INIT"		: 0x60,
-		"VERSION"	: 0x70,
 		"DANCE"		: 0x40
 	};
 
@@ -93,16 +90,14 @@ function Vortex(deviceElement, writeElement, readElement) {
 		self.okToSend = true;
 
 		//initVortex();
-		var cmd = commandCode["INIT"];
+		var cmd = Vortex.commandCode["INIT"];
 		self.sendData([cmd]);
 	}
 
 	self.disconnect = function () {
 		console.log("WARNING: Disconnected is not implemented yet...");
 		//TODO: GATT service and device disconnection
-		//self.device.gatt.disconnect().then(function() ...
-		//self.device.disconnect().then(function() ...
-		//self.connected=false;
+		//self.device.disconnect().then(function() { self.connected=false });
 	}
 
 	self.isConnected = function() {
@@ -113,7 +108,7 @@ function Vortex(deviceElement, writeElement, readElement) {
 	self.sendData = function (byteArray) {
 		console.log(byteArray);
 		var bytes = new Uint8Array(byteArray);
-		if (self.connected) {
+		if (self.connected && self.okToSend) {
 			self.okToSend = false;
 			self.writeElement.write(bytes).then(function() {
 				self.okToSend = true;
@@ -137,7 +132,7 @@ function Vortex(deviceElement, writeElement, readElement) {
 	 */
 	self.reset = function() {
 		self.okToSend = true;
-		self.move(0,0);
+		seld.stopMotors();
 		self.stopMusic();
 		self.stopDance();
 		self.faceOff();
@@ -180,6 +175,9 @@ function Vortex(deviceElement, writeElement, readElement) {
 		self.sendData([cmd, leftDirection | leftSpeed , rightDirection | rightSpeed, duration]);
 	};
 
+	self.stopMotors = function () {
+		self.setMotorSpeeds(0,0);
+	}
 
 	// ------------------------------------------------------------------------------
 	// Face
@@ -194,11 +192,19 @@ function Vortex(deviceElement, writeElement, readElement) {
 	self.setFace = function(expression, color) {
 		var cmd = Vortex.commandCode["FACE"];
 		expression = Vortex.bound(expression, 0, 33);
+		color = color || self.currentFaceColour
+		self.currentFace = expression;
+		self.currentFaceColour = color;
 		color = Vortex.translateColorBit(color);
 		self.sendData([cmd, expression, color]);
 	};
 
-	self.faceOff = function(expresion, colour) {
+	self.setFaceColour = function(colour) {
+		self.setFace(self.currentFace, colour);
+	}
+
+
+		self.faceOff = function(expresion, colour) {
 		self.setFace(0,"off");
 	};
 
@@ -217,7 +223,7 @@ function Vortex(deviceElement, writeElement, readElement) {
 	};
 
 	self.stopDance = function() {
-		var cmd = commandCode["DANCE"];
+		var cmd = Vortex.commandCode["DANCE"];
 		self.sendData([cmd, 0xFF]);
 	};
 

@@ -20,15 +20,10 @@
 
         var app = document.querySelector('#my-app');
 
-        app.faceSelected = function(e) {
-            console.log(e.model.item);
-            vortex.setFace(e.model.item.index+1, "red");
-        }
-
-
-        app.handleInput = function (e) {
-            console.log("col change");
-        }
+        //app.faceSelected = function(e) {
+        //    console.log(e.model.item);
+        //    vortex.setFace(e.model.item.index+1, "red");
+        //}
 
 
         // ------------------------------------------------------------------------------
@@ -43,9 +38,25 @@
             pages.selected = tabs.selected;
         });
 
+
+        // Face Change
+
+        document.querySelector('#face-slider').addEventListener('change', function(event) {
+            vortex.setFace(event.target.value);
+        });
+
+
+        var faceColourGroup = document.querySelector('#face-colour-group');
+        faceColourGroup.addEventListener('iron-select', function() {
+            var colour = faceColourGroup.selected;
+            console.log("FAce colour selected:" + colour);
+            vortex.setFaceColour(colour);
+        });
+
+
         // Dance Group
 
-        var danceGroup = document.querySelector('#danceGroup');
+        var danceGroup = document.querySelector('#dance-group');
         danceGroup.addEventListener('iron-select', function() {
             var dance = danceGroup.selected;
             console.log("dance selected:" + dance);
@@ -62,7 +73,7 @@
 
         // Music Group
 
-        var musicGroup = document.querySelector('#musicGroup');
+        var musicGroup = document.querySelector('#music-group');
         musicGroup.addEventListener('iron-select', function() {
             var music = musicGroup.selected;
             console.log("music selected:" + music);
@@ -106,8 +117,6 @@
 
 
         var connectButton = document.getElementById("connect-toggle");
-
-
         connectButton.addEventListener('click', function() {
             console.log("Connecting");
 
