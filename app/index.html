@@ -17,7 +17,6 @@
      in this file. All other imports should go in elements.html -->
     <link rel="import" href="elements/elements.html">
 
-    <link rel="stylesheet" href="styles/retro-joystick.css">
 
     <script src="scripts/vortex.js"></script>
     <script src="scripts/app.js"></script>
@@ -28,17 +27,30 @@
 
     <template is="dom-bind" id="my-app">
 
+        <div id="cards">
+
+
+            <paper-dialog id="no-bluetooth">
+                <h2>No Web Bluetooth</h2>
+                <p>The Web Bluetooth API is missing. Please enable it at
+                    chrome://flags/#enable-web-bluetooth and try again.</p>
+            </paper-dialog>
+
+            <paper-dialog id="dialog">
+                <h2>Error</h2>
+                <p>Could not connect to bluetooth device!</p>
+            </paper-dialog>
+        </div>
+
+
         <paper-toolbar class="medium-tall">
 
             <paper-icon-button icon="menu"></paper-icon-button>
             <div><paper-toggle-button class="blue" id="connect-toggle">Connect</paper-toggle-button></div>
+
             <!--
             <div>Vortex</div>
             <div><paper-button id="send-reset-button" raised>Send Reset</paper-button></div>
-            -->
-            <!--
-            <paper-icon-button icon="search"></paper-icon-button>
-            <paper-icon-button icon="more-vert"></paper-icon-button>
             -->
 
             <div class="bottom fit" horizontal layout>
@@ -70,7 +82,12 @@
                         <div class="retrostick-ball"></div>
                     </div>
                 </div>
+                <!--
+                <div><paper-toggle-button class="blue" id="pid-toggle">Enable Line Following</paper-toggle-button></div>
+                -->
             </div>
+
+
 
             <!-- Dancing page -->
             <div>
@@ -96,7 +113,11 @@
                     </template>
                 </iron-list>
                 -->
-                <paper-slider pin id="face-slider"  min="0" max="33" value="1"></paper-slider>
+
+                <div>Eye pattern</div>
+                <paper-slider id="face-slider" pin editable min="0" max="33" value="1"></paper-slider>
+
+                <div>Eye Colour</div>
 
                 <paper-radio-group selected="red" id="face-colour-group">
                     <paper-radio-button name="off">Off</paper-radio-button>
@@ -113,9 +134,8 @@
 
             <!-- Colours page -->
             <div>
-                <paper-color-input id="vortex-colour" label="Vortex Colour" shape="circle" type="hsl" on-input="handleInput" ></paper-color-input>
-                <paper-color-input label="All Top Colours" shape="circle" type="hsl" on-input="handleInput" ></paper-color-input>
-                <paper-color-input label="All Underside Colours" shape="circle" type="hsl" on-input="handleInput" ></paper-color-input>
+                <paper-color-input id="top-colours" label="Top Colours" shape="circle" type="hsl"></paper-color-input>
+                <paper-color-input id="bottom-colours" label="Underside Colours" shape="circle" type="hsl"></paper-color-input>
             </div>
 
             <!-- Music page -->
@@ -126,6 +146,10 @@
                     <paper-radio-button name="music2">Music 2</paper-radio-button>
                     <paper-radio-button name="music3">Music 3</paper-radio-button>
                     <paper-radio-button name="music4">Music 4</paper-radio-button>
+                    <paper-radio-button name="music5">Music 5</paper-radio-button>
+                    <paper-radio-button name="music6">Music 6</paper-radio-button>
+                    <paper-radio-button name="music7">Music 7</paper-radio-button>
+                    <paper-radio-button name="rnd">Random</paper-radio-button>
                 </paper-radio-group>
             </div>
         </iron-pages>
@@ -136,6 +160,9 @@
                                                characteristic='0000dfb1-0000-1000-8000-00805f9b34fb'>
             </platinum-bluetooth-characteristic>
         </platinum-bluetooth-device>
+
+
+
     </template>
 
 

@@ -7,12 +7,12 @@
     });
 
 
-
     // ------------------------------------------------------------------------------
     // On Page load
 
     function startApp() {
         var leftMotorSpeed=0, rightMotorSpeed=0;
+        var sendJoypadUpdates = false;
 
         Polymer({
             is: 'my-app',
@@ -20,10 +20,10 @@
 
         var app = document.querySelector('#my-app');
 
-        //app.faceSelected = function(e) {
-        //    console.log(e.model.item);
-        //    vortex.setFace(e.model.item.index+1, "red");
-        //}
+
+        if (navigator.bluetooth == undefined) {
+            document.getElementById("no-bluetooth").open();
+        }
 
 
         // ------------------------------------------------------------------------------
@@ -36,12 +36,18 @@
 
         tabs.addEventListener('iron-select', function() {
             pages.selected = tabs.selected;
+            console.log(pages.selected);
+            if (pages.selected == "0" ) {
+               sendJoypadUpdates = vortex.isConnected();
+            } else {
+                sendJoypadUpdates = false;
+            }
         });
 
 
         // Face Change
 
-        document.querySelector('#face-slider').addEventListener('change', function(event) {
+        document.querySelector('#face-slider').addEventListener('value-change', function(event) {
             vortex.setFace(event.target.value);
         });
 
@@ -49,7 +55,7 @@
         var faceColourGroup = document.querySelector('#face-colour-group');
         faceColourGroup.addEventListener('iron-select', function() {
             var colour = faceColourGroup.selected;
-            console.log("FAce colour selected:" + colour);
+            console.log("Face colour selected:" + colour);
             vortex.setFaceColour(colour);
         });
 
@@ -79,10 +85,14 @@
             console.log("music selected:" + music);
             switch (music) {
                 case "musicOff": vortex.stopMusic(); break;
-                case "music1": vortex.startMusic(0); break;
-                case "music2": vortex.startMusic(1); break;
-                case "music3": vortex.startMusic(2); break;
-                case "music4": vortex.startMusic(3); break;
+                case "music1": vortex.startMusic(1); break;
+                case "music2": vortex.startMusic(2); break;
+                case "music3": vortex.startMusic(3); break;
+                case "music4": vortex.startMusic(4); break;
+                case "music5": vortex.startMusic(5); break;
+                case "music6": vortex.startMusic(6); break;
+                case "music7": vortex.startMusic(7); break;
+                case "rnd": vortex.startMusic(Math.floor(Math.random() * (256 - 1) + 1)); break; // 1 to 255
                 default:    vortex.stopMusic();
             }
         });
@@ -90,17 +100,52 @@
 
         // Colour Selectors
 
-        var vortexColourPicker = document.querySelector('#vortex-colour');
-        vortexColourPicker.addEventListener('value-changed', function(){
-            var normalizedEvent = Polymer.dom(event);
+        // the paper-colour-picker components fires 4 individual events for r, g, b and alpha for a single colour change
+        // TODO: investigate how to listen to a composite colour change event
+
+        var topColourPicker = document.querySelector('#top-colours');
+        topColourPicker.addEventListener('value-changed', function(){
+            //var normalizedEvent = Polymer.dom(event);
             //console.info('rootTarget is:', normalizedEvent.rootTarget);
             //console.info('localTarget is:', normalizedEvent.localTarget);
             //console.info('path is:', normalizedEvent.path);
-            console.log("Colour: " + event.detail.value);
-            console.log(vortexColourPicker.value.red, vortexColourPicker.value.green, vortexColourPicker.value.blue);
+            console.log("Top Colour: " + event.detail.value);
+            var r = topColourPicker.value.red;
+            var g = topColourPicker.value.green;
+            var b = topColourPicker.value.blue;
+            console.log(r,g,b);
+            vortex.setTopLED(Vortex.LED.LED_ALL, r, g, b);
         });
 
 
+        var bottomColourPicker = document.querySelector('#bottom-colours');
+        bottomColourPicker.addEventListener('value-changed', function(){
+            console.log("Bottom Colour: " + event.detail.value);
+            var r = bottomColourPicker.value.red;
+            var g = bottomColourPicker.value.green;
+            var b = bottomColourPicker.value.blue;
+            console.log(r,g,b);
+            vortex.setBottomLED(Vortex.LED.LED_ALL, r, g, b);
+        });
+
+
+        /*
+         var resetButton = document.getElementById("send-reset-button");
+         if (resetButton) {
+         resetButton.addEventListener('click', function () {
+         bluetoothDevice.request().then(function () {
+         vortex.reset();
+         }).catch(onError);
+         });
+         }*/
+
+        /*
+         var lineFollowButton = document.getElementById("pid-toggle");
+         lineFollowButton.addEventListener('click', function() {
+         console.log(lineFollowButton.checked);
+         vortex.setPidEnabled(lineFollowButton.checked);
+         sendJoypadUpdates = !lineFollowButton.checked;
+         });*/
 
 
 
@@ -123,22 +168,16 @@
             bluetoothDevice.request().then(function(device) {
                 //console.log(device);
                 vortex.onConnect(device);
+                sendJoypadUpdates = true;       // assumes we start on the Joypad tab
+
             }).catch(onError);
         });
 
 
-        var resetButton = document.getElementById("send-reset-button");
-        if (resetButton) {
-            resetButton.addEventListener('click', function () {
-                bluetoothDevice.request().then(function () {
-                    vortex.reset();
-                }).catch(onError);
-            });
-        }
-
         function onError(error) {
             console.log("ERROR: " + error);
         }
+
 
         // ------------------------------------------------------------------------------
         // Joystick
@@ -163,9 +202,9 @@
 
 
         setInterval( function() {
-            if (vortex.isConnected()) {
+            if (sendJoypadUpdates) {
                     vortex.setMotorSpeeds(leftMotorSpeed, rightMotorSpeed);
-                    console.log(new Date().getTime() + ": " + leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
+                    //console.log(new Date().getTime() + ": " + leftMotorSpeed.toFixed(2), rightMotorSpeed.toFixed(2));
                 }
         }, 200);
 
