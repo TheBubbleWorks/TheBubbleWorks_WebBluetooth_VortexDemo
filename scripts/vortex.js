@@ -28,6 +28,7 @@ function Vortex(deviceElement, writeElement, readElement) {
 	// Command code map sent to Vortex
 	Vortex.commandCode = {
 		"MOVE"		: 0x20,
+		"PIDLINE"	: 0x21,
 		"TOP_LED"	: 0x03,
 		"BOTTOM_LED": 0x01,
 		"FACE"		: 0x02,
@@ -179,6 +180,11 @@ function Vortex(deviceElement, writeElement, readElement) {
 		self.setMotorSpeeds(0,0);
 	}
 
+	self.setPidEnabled = function(status)  {
+		var cmd = Vortex.commandCode["PIDLINE"];
+		self.sendData([cmd, status]);
+	}
+
 	// ------------------------------------------------------------------------------
 	// Face
 
@@ -258,40 +264,35 @@ function Vortex(deviceElement, writeElement, readElement) {
 		self.sendData([cmd, volume]);
 	}
 
-	self.setTopLED = function(address, color, duration){
+
+
+	self.setTopLED = function(address, r,g,b, duration){
 		var cmd = Vortex.commandCode["TOP_LED"];
-		console.log("Top LED color", color.toString(16));
-		self._led(cmd, address, color, duration);
+		self._led(cmd, address, r,g,b, duration);
 	}
 
-	self.setBottomLED = function(address, color, duration)  {
+	self.setBottomLED = function(address, r,g,b, duration)  {
 		var cmd = Vortex.commandCode["BOTTOM_LED"];
-		console.log("Bottom LED color", color.toString(16));
-		self._led(cmd, address, color, duration);
+		self._led(cmd, address, r,g,b, duration);
 	}
 
 
 	self.setAllBottomLEDsOff = function() {
-		self.setBottomLED(0xFF, 0);
+		self.setBottomLED(VortexAPI.LED_ALL, 0 ,0, 0);
 	}
 
 
 	self.setAllTopLEDsOff = function() {
-		self.setTopLED(VortexAPI.LED_ALL, 0);
+		self.setTopLED(VortexAPI.LED_ALL, 0,0 ,0);
 	}
 
 
-	self._led = function(cmd, address, color, duration){
-
+	self._led = function(cmd, address, r, g, b, duration){
+		console.log("led: ", cmd, address, r,g,b,duration);
 		if (!cmd){
 			log("Error: no led command");
 			return;
 		}
-
-		color = color & 0xFFFFFF;
-		var r = (color & 0xFF0000) >> 16;
-		var g = (color & 0x00FF00) >> 8;
-		var b = (color & 0x0000FF) >> 0;
 
 		duration = duration || 0;
 		duration = Math.floor(duration * 1000 / 20)
